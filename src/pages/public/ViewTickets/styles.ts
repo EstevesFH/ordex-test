@@ -1,136 +1,81 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
+
+export const Loading = styled.div`
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${ds.colors.background};
+  color: ${ds.colors.textSecondary};
+`
 
 export const Container = styled.div`
   min-height: 100vh;
-  background: radial-gradient(ellipse at top left, #1e3a8a 0%, #0f172a 50%, #020617 100%);
-  background-attachment: fixed;
-  padding: 40px 24px;
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 20px 16px;
-  }
+  background: ${ds.colors.background};
+  padding: ${ds.spacing.xl};
 `
 
 export const Header = styled.div`
-  margin-bottom: 32px;
+  max-width: 1200px;
+  margin: 0 auto ${ds.spacing.lg};
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  gap: ${ds.spacing.md};
   flex-wrap: wrap;
-  gap: 16px;
 `
 
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: ${ds.spacing.md};
 
   h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #f1f5f9;
-    letter-spacing: -0.5px;
-
-    @media (max-width: 768px) {
-      font-size: 24px;
-    }
+    margin: 0;
+    color: ${ds.colors.textMain};
+    font-size: ${ds.typography.size.xxl};
   }
 `
 
-export const Controls = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-`
-
-export const BackButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: #cbd5e1;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(148, 163, 184, 0.4);
-    color: #f1f5f9;
-    transform: translateX(-4px);
-  }
-  
-  svg {
-    transition: transform 0.3s ease;
-  }
-  
-  &:hover svg {
-    transform: translateX(-2px);
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  svg {
-    font-size: 18px;
-  }
+export const SearchInput = styled.input`
+  width: 100%;
+  max-width: 460px;
+  padding: 12px 14px;
+  border-radius: ${ds.radius.md};
+  border: 1px solid ${ds.colors.border};
+  background: ${ds.colors.surface};
 `
 
 export const TableCard = styled.div`
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 32px;
-  border-radius: 24px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  width: 100%;
-  overflow-x: auto;
-
-  @media (max-width: 768px) {
-    padding: 20px;
-    border-radius: 16px;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  border-radius: ${ds.radius.lg};
+  padding: ${ds.spacing.lg};
 `
 
 export const TableHeader = styled.div`
-  margin-bottom: 24px;
-
   h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #f1f5f9;
+    margin: 0 0 ${ds.spacing.md};
+    color: ${ds.colors.textMain};
+    font-size: ${ds.typography.size.lg};
   }
 `
 
 export const ErrorMessage = styled.div`
-  text-align: center;
-  padding: 40px 20px;
-  color: #fca5a5;
-  font-size: 16px;
-  background: rgba(239, 68, 68, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 12px;
+  padding: ${ds.spacing.md};
+  border-radius: ${ds.radius.md};
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
 `
 
 export const EmptyMessage = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-  font-size: 16px;
+  color: ${ds.colors.textSecondary};
+  padding: ${ds.spacing.xl};
 `
 
 export const TruncatedText = styled.span`
@@ -138,114 +83,60 @@ export const TruncatedText = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 220px;
 `
 
 export const TableWrapper = styled.div`
-  max-height: 350px;
-  overflow-y: auto;
-  margin-bottom: 24px;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    
-    &:hover {
-      background: rgba(148, 163, 184, 0.5);
-    }
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.2);
-  }
+  overflow-x: auto;
 
   table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  th {
+  th,
+  td {
     text-align: left;
-    font-size: 13px;
-    color: #ffffff;
-    font-weight: 600;
-    padding-bottom: 12px;
-    position: sticky;
-    top: 0;
-    //background: rgba(15, 23, 42, 0.9);
-    //backdrop-filter: blur(12px);
-
-    &:nth-child(6) {
-      max-width: 200px;
-    }
+    padding: 12px 8px;
+    border-bottom: 1px solid ${ds.colors.border};
+    color: ${ds.colors.textMain};
+    font-size: ${ds.typography.size.sm};
   }
 
-  td {
-    padding: 12px 8px;
-    font-size: 14px;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-
-    &:nth-child(6) {
-      max-width: 200px;
-    }
+  th {
+    color: ${ds.colors.textSecondary};
+    font-weight: ${ds.typography.weight.semibold};
   }
 `
 
 export const Status = styled.span<{ status: string }>`
+  display: inline-flex;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
   border: 1px solid;
-
+  font-weight: ${ds.typography.weight.semibold};
   background: ${({ status }) =>
     status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.1)'
+      ? '#fef2f2'
       : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.1)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.1)'
-      : 'rgba(16, 185, 129, 0.1)'};
-
-  border-color: ${({ status }) =>
-    status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.3)'
-      : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.3)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.3)'
-      : 'rgba(16, 185, 129, 0.3)'};
-
+        ? '#eff6ff'
+        : status === 'Aguardando'
+          ? '#fffbeb'
+          : '#ecfdf5'};
   color: ${({ status }) =>
     status === 'Aberto'
-      ? '#fca5a5'
+      ? '#b91c1c'
       : status === 'Em Andamento'
-      ? '#60a5fa'
-      : status === 'Aguardando'
-      ? '#fbbf24'
-      : '#6ee7b7'};
-`
-
-export const Actions = styled.div`
-  display: flex;
-  gap: 8px;
-
-  button {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 18px;
-    color: #64748b;
-    padding: 4px;
-
-    &:hover {
-      color: #2563eb;
-    }
-  }
+        ? '#1d4ed8'
+        : status === 'Aguardando'
+          ? '#b45309'
+          : '#047857'};
+  border-color: ${({ status }) =>
+    status === 'Aberto'
+      ? '#fecaca'
+      : status === 'Em Andamento'
+        ? '#bfdbfe'
+        : status === 'Aguardando'
+          ? '#fde68a'
+          : '#a7f3d0'};
 `

@@ -6,7 +6,8 @@ import { Loader } from '../../../../components/Loader'
 import { Pagination } from '../../../../components/Pagination'
 import { Button } from '../../../../components/Button'
 import { LocationModal } from './LocationModal'
-import { Filter, FilterField } from '../../../../components/Filter'
+import { Filter } from '../../../../components/Filter'
+import type { FilterField } from '../../../../components/Filter'
 
 export interface Location {
   id: number
