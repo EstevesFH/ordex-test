@@ -4,7 +4,8 @@ import { useStockItems } from '../../../hooks/useStockItems'
 import { useToast } from '../../../hooks/useToast'
 import type { StockItem } from '../../../types'
 import { Button } from '../../../components/Button'
-import { Filter, FilterField } from '../../../components/Filter'
+import { Filter } from '../../../components/Filter'
+import type { FilterField } from '../../../components/Filter'
 import { Pagination } from '../../../components/Pagination'
 import { SkeletonTable } from '../../../components/Skeleton'
 import StockItemModal from './StockItemModal'
@@ -133,9 +134,12 @@ const Stock: React.FC = () => {
       )}
 
       <S.Controls>
-        <Button variant="secondary" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-          Filtros {(search || filterStatus || showLowStock) && '(Ativos)'}
-        </Button>
+        <Button
+          title={`Filtrar ${(search || filterStatus || showLowStock) ? '(Ativos)' : ''}`.trim()}
+          variant="secondary"
+          size="small"
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        />
         {showLowStock && (
           <S.LowStockBadge>
             <FiAlertCircle size={14} />
@@ -143,9 +147,7 @@ const Stock: React.FC = () => {
           </S.LowStockBadge>
         )}
         {(search || filterStatus || showLowStock) && (
-          <Button variant="secondary" onClick={clearFilters}>
-            Limpar Filtros
-          </Button>
+          <Button title="Limpar filtros" variant="secondary" size="small" onClick={clearFilters} />
         )}
       </S.Controls>
 

@@ -1,45 +1,50 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../styles/designSystem'
 
 export const PaginationContainer = styled.div`
-  margin-top: 24px;
+  margin-top: ${ds.spacing.md};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  flex-wrap: wrap;
+  gap: ${ds.spacing.sm};
+  padding: 10px 12px;
+  border-radius: ${ds.radius.md};
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 
   select {
-    margin: 0 8px;
-    padding: 6px 10px;
+    padding: 4px 8px;
     border-radius: 8px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    font-size: 13px;
-    background: rgba(0, 0, 0, 0.2);
-    color: #cbd5e1;
+    border: 1px solid ${ds.colors.border};
+    font-size: ${ds.typography.size.sm};
+    background: ${ds.colors.surface};
+    color: ${ds.colors.textMain};
     cursor: pointer;
-    transition: all 0.2s ease;
-    
+
     &:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-    }
-    
-    &:hover {
-      border-color: rgba(148, 163, 184, 0.3);
+      border-color: ${ds.colors.primaryLight};
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
     }
   }
 
   span {
-    font-size: 13px;
-    color: #94a3b8;
-    font-weight: 500;
+    font-size: 12px;
+    color: ${ds.colors.textSecondary};
+    font-weight: ${ds.typography.weight.medium};
   }
 
   > div:last-child {
     display: flex;
+    align-items: center;
     gap: 6px;
   }
 `

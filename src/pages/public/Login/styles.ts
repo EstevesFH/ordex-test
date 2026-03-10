@@ -1,72 +1,65 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
 
 export const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  background: #020617; /* Fallback */
-`;
+  padding: ${ds.spacing.lg};
+  background: ${ds.colors.background};
+`
 
 export const LoginCard = styled.div`
-  position: relative;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 40px;
-  border-radius: 28px;
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  padding: ${ds.spacing.xl};
+  border-radius: ${ds.radius.lg};
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-`;
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.08);
+`
 
 export const LogoWrapper = styled.div`
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: ${ds.spacing.lg};
 
   .icon-box {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: ${ds.colors.primaryPale};
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px;
-    color: white;
-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    color: ${ds.colors.primary};
+    border: 1px solid #bfdbfe;
   }
 
   h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 4px;
-    letter-spacing: -0.5px;
+    font-size: ${ds.typography.size.xl};
+    font-weight: ${ds.typography.weight.bold};
+    color: ${ds.colors.textMain};
+    margin: 0 0 4px;
   }
 
   p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.textSecondary};
+    margin: 0;
   }
-`;
+`
 
 export const InputGroup = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: ${ds.spacing.md};
 
   label {
     display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: ${ds.typography.size.sm};
+    font-weight: ${ds.typography.weight.semibold};
+    color: ${ds.colors.textSecondary};
     margin-bottom: 8px;
-    padding-left: 4px;
   }
 
   .input-wrapper {
@@ -76,69 +69,62 @@ export const InputGroup = styled.div`
 
     svg {
       position: absolute;
-      left: 16px;
-      color: rgba(255, 255, 255, 0.3);
-      transition: color 0.2s;
+      left: 14px;
+      color: ${ds.colors.textSecondary};
     }
 
     input {
       width: 100%;
-      padding: 14px 16px 14px 48px;
-      font-size: 0.95rem;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      color: white;
+      padding: 12px 12px 12px 42px;
+      font-size: ${ds.typography.size.base};
+      border: 1px solid ${ds.colors.border};
+      border-radius: ${ds.radius.md};
+      background: ${ds.colors.surface};
+      color: ${ds.colors.textMain};
       outline: none;
-      transition: all 0.2s;
 
       &:focus {
-        border-color: #3b82f6;
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        
-        & + svg {
-          color: #3b82f6;
-        }
+        border-color: ${ds.colors.primaryLight};
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
       }
 
       &::placeholder {
-        color: rgba(255, 255, 255, 0.2);
+        color: #94a3b8;
       }
     }
   }
-`;
+`
 
 export const ErrorAlert = styled.div`
   padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  font-size: 0.85rem;
+  margin-bottom: ${ds.spacing.md};
+  border-radius: ${ds.radius.md};
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: ${ds.typography.size.sm};
   text-align: center;
-`;
+`
 
 export const ActionWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
-`;
+  gap: 10px;
+  margin-top: ${ds.spacing.md};
+`
 
 export const ForgotLink = styled.div`
   text-align: right;
-  margin-bottom: 20px;
-  
+  margin-bottom: ${ds.spacing.md};
+
   a {
-    font-size: 0.85rem;
-    color: #3b82f6;
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.primary};
     text-decoration: none;
-    font-weight: 500;
-    
+    font-weight: ${ds.typography.weight.medium};
+
     &:hover {
       text-decoration: underline;
     }
   }
-`;
+`
