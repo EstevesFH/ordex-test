@@ -1,86 +1,48 @@
-import styled from 'styled-components';
-import { designSystem } from '../../../styles/designSystem';
+import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
 
 export const FullPageContainer = styled.div`
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  background: #f8fafc;
-  font-family: ${designSystem.typography.fontFamily};
-`;
-
-export const LogoSection = styled.div`
+  min-height: 100vh;
+  background: ${ds.colors.background};
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 50px;
-  color: ${designSystem.colors.primary};
-  
-  h1 {
-    font-size: 1.6rem;
-    font-weight: 900;
-    margin: 0;
-    letter-spacing: -1px;
-  }
-`;
+  justify-content: center;
+  padding: ${ds.spacing.xl};
+  font-family: ${ds.typography.fontFamily};
+`
 
-// Botão estilo "Ghost" para a Sidebar
-export const MenuButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: #475569;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.5);
-    color: ${designSystem.colors.primary};
-  }
-`;
-
-// CONTEÚDO CENTRAL
 export const MainContent = styled.main`
-  flex: 1;
-  position: relative;
-  z-index: 10;
+  width: 100%;
+  max-width: 760px;
+`
+
+export const BrandCard = styled.div`
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  border-radius: ${ds.radius.lg};
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.06);
+  padding: ${ds.spacing.xl};
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: ${ds.spacing.md};
+`
+
+export const Subtitle = styled.p`
+  margin: 0;
+  color: ${ds.colors.textSecondary};
+  font-size: ${ds.typography.size.base};
   text-align: center;
-`;
-
-export const BadgeText = styled.span`
-  background: rgba(255, 255, 255, 0.6);
-  padding: 6px 16px;
-  border-radius: 50px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: ${designSystem.colors.primary};
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  margin-bottom: 24px;
-`;
-
-export const HeroTitle = styled.h2`
-  font-size: 3.8rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  margin-bottom: 30px;
-`;
+`
 
 export const ButtonGroup = styled.div`
-  display: flex;
-  gap: 16px;
-`;
+  width: 100%;
+  margin-top: ${ds.spacing.md};
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: ${ds.spacing.sm};
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`
