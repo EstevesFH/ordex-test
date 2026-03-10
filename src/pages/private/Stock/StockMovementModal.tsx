@@ -14,16 +14,27 @@ interface StockMovementModalProps {
 }
 
 interface SessionUser {
+<<<<<<< codex/review-my-code-fbp7vh
+  id?: number
+}
+
+const getSessionUserId = (): number | undefined => {
+=======
   username?: string
 }
 
 const getSessionUsername = (): string | undefined => {
+>>>>>>> master
   const raw = localStorage.getItem('user')
   if (!raw) return undefined
 
   try {
     const parsed = JSON.parse(raw) as SessionUser
+<<<<<<< codex/review-my-code-fbp7vh
+    return typeof parsed.id === 'number' ? parsed.id : undefined
+=======
     return parsed.username || undefined
+>>>>>>> master
   } catch {
     return undefined
   }
@@ -69,7 +80,11 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
         newQuantity,
         reason || undefined,
         undefined,
+<<<<<<< codex/review-my-code-fbp7vh
+        getSessionUserId()
+=======
         getSessionUsername()
+>>>>>>> master
       )
 
       if (result.success) {
