@@ -45,6 +45,12 @@ export const SearchInput = styled.input`
   border-radius: ${ds.radius.md};
   border: 1px solid ${ds.colors.border};
   background: ${ds.colors.surface};
+
+  &:focus {
+    outline: none;
+    border-color: ${ds.colors.primaryLight};
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
 `
 
 export const TableCard = styled.div`
@@ -54,6 +60,7 @@ export const TableCard = styled.div`
   border: 1px solid ${ds.colors.border};
   border-radius: ${ds.radius.lg};
   padding: ${ds.spacing.lg};
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
 `
 
 export const TableHeader = styled.div`

@@ -44,7 +44,7 @@ export const FormCard = styled.div`
   width: 100%;
   max-width: 900px;
   border: 1px solid ${ds.colors.border};
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
 
   h2 {
     font-size: ${ds.typography.size.lg};

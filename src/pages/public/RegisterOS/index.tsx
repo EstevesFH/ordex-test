@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
 import { supabase } from '../../../services/supabase'
-import Iridescence from '../../../components/ReactBits/Iridescence'
 import Button from '../../../components/Button'
 import type { User, Location, Product } from '../../../types'
 import * as S from './styles'
@@ -129,13 +128,6 @@ const RegisterOS = () => {
 
   return (
     <S.Container>
-      <Iridescence 
-        color={[0.12, 0.24, 0.45]}
-        speed={0.3}
-        amplitude={0.15}
-        mouseReact={false}
-      />
-
       <S.Header>
         <S.TitleSection>
           <Button onClick={() => navigate(-1)}>

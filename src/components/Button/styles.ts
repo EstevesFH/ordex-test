@@ -3,11 +3,18 @@ import { designSystem as ds } from '../../styles/designSystem'
 
 export interface StyledButtonProps {
   $variant?: 'primary' | 'secondary' | 'tertiary'
+  $size?: 'small' | 'medium' | 'large'
   $primary?: boolean
 }
 
+const paddingBySize = {
+  small: '6px 12px',
+  medium: '10px 16px',
+  large: '12px 20px',
+}
+
 export const ActionButton = styled.button<StyledButtonProps>`
-  padding: 10px 16px;
+  padding: ${({ $size = 'medium' }) => paddingBySize[$size]};
   border-radius: ${ds.radius.md};
   font-weight: ${ds.typography.weight.semibold};
   font-size: ${ds.typography.size.sm};
