@@ -59,20 +59,20 @@ const Pagination = ({
         <select value={itemsPerPage} onChange={handleItemsPerPage}>
           {itemsPerPageOptions.map(opt => (
             <option key={opt} value={opt}>
-              Mostrar {opt} linhas
+              {opt} / pág
             </option>
           ))}
         </select>
         <span>
-          Mostrando {startItem}-{endItem} de {calculatedTotalItems} linhas
+          {startItem}-{endItem} de {calculatedTotalItems}
         </span>
       </div>
 
       <div>
-        <Button disabled={page === 1} onClick={() => changePage(1)}>{'<<'}</Button>
-        <Button disabled={page === 1} onClick={() => changePage(page - 1)}>{'<'}</Button>
-        <Button disabled={page === totalPages} onClick={() => changePage(page + 1)}>{'>'}</Button>
-        <Button disabled={page === totalPages} onClick={() => changePage(totalPages)}>{'>>'}</Button>
+        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(1)}>{'<<'}</Button>
+        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(page - 1)}>{'<'}</Button>
+        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(page + 1)}>{'>'}</Button>
+        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(totalPages)}>{'>>'}</Button>
       </div>
     </S.PaginationContainer>
   )
