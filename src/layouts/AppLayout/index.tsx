@@ -1,6 +1,7 @@
-import { FC, useState, useEffect, useCallback, useMemo } from 'react'
+import { type FC, useState, useEffect, useCallback, useMemo } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { FiHome, FiClipboard, FiSettings, FiLogOut, FiMenu, FiX, FiBox, FiEdit3 } from 'react-icons/fi'
+import { supabase } from '@/services/supabase'
 import * as S from './styles'
 
 type AppRole = 'Administrador' | 'Operador'
@@ -39,7 +40,8 @@ export const AppLayout: FC = () => {
     })
   }, [])
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback(async () => {
+    await supabase.auth.signOut()
     localStorage.removeItem('user')
     navigate('/login', { replace: true })
   }, [navigate])

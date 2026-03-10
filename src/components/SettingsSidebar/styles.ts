@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { designSystem as ds } from '../../styles/designSystem'
+import { designSystem as ds } from '@/styles/designSystem'
 
 interface NavItemProps {
   active?: boolean
