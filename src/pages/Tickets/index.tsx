@@ -9,6 +9,7 @@ import { Pagination } from '@/components/Pagination'
 import { Button } from '@/components/Button'
 import { Filter } from '@/components/Filter'
 import type { FilterField } from '@/components/Filter'
+import { getSessionUser } from '@/utils/session'
 
 const Tickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -23,6 +24,8 @@ const Tickets = () => {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterPrioridade, setFilterPrioridade] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  const isSupervisor = getSessionUser()?.role === 'Supervisor'
 
   const fetchTickets = async () => {
     setLoading(true)
@@ -191,12 +194,14 @@ const Tickets = () => {
                           >
                             <FiEye />
                           </button>
-                          <button 
-                            onClick={() => openEdit(ticket)}
-                            aria-label="Editar ticket"
-                          >
-                            <FiEdit />
-                          </button>
+                          {!isSupervisor && (
+                            <button 
+                              onClick={() => openEdit(ticket)}
+                              aria-label="Editar ticket"
+                            >
+                              <FiEdit />
+                            </button>
+                          )}
                         </S.Actions>
                       </td>
                     </tr>
