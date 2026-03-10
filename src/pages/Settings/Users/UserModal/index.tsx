@@ -76,8 +76,9 @@ const UserModal = ({ user, mode, onClose, onUpdated }: UserModalProps) => {
         </S.Title>
 
         <S.Field>
-          <label>Nome do usuário</label>
+          <label htmlFor="userName">Nome do usuário</label>
           <input
+            id="userName"
             value={userName}
             onChange={e => setUserName(e.target.value)}
           />
@@ -85,8 +86,9 @@ const UserModal = ({ user, mode, onClose, onUpdated }: UserModalProps) => {
 
         {isEdit && (
           <S.Field>
-            <label>Status</label>
+            <label htmlFor="userStatus">Status</label>
             <select
+              id="userStatus"
               value={status}
               onChange={e =>
                 setStatus(e.target.value as 'Ativo' | 'Inativo')

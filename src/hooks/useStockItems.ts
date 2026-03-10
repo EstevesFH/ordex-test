@@ -166,8 +166,14 @@ export const useStockItems = () => {
       if (updateError) throw updateError
 
       // Criar registro de movimentação
-      const movementType = newQuantity > previousQuantity ? 'in' : 
-                          newQuantity < previousQuantity ? 'out' : 'adjustment'
+      let movementType: string;
+      if (newQuantity > previousQuantity) {
+        movementType = 'in';
+      } else if (newQuantity < previousQuantity) {
+        movementType = 'out';
+      } else {
+        movementType = 'adjustment';
+      }
 
       const { error: movementError } = await supabase
         .from('stock_movements')

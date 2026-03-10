@@ -12,7 +12,7 @@ const ForgotPassword: React.FC = () => {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -87,8 +87,9 @@ const ForgotPassword: React.FC = () => {
 
         <S.Form onSubmit={handleSubmit}>
           <S.Field>
-            <label>E-mail</label>
+            <label htmlFor="forgot-password-email">E-mail</label>
             <input
+              id="forgot-password-email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}

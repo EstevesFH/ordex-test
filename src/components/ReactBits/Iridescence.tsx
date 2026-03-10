@@ -43,12 +43,12 @@ void main() {
 `
 
 export default function Iridescence({
-  color = [0.7, 0.8, 1.0],
-  speed = 1.0,
+  color = [0.7, 0.8, 1],
+  speed = 1,
   amplitude = 0.1,
   mouseReact = true,
   ...rest
-}: IridescenceProps) {
+}: Readonly<IridescenceProps>) {
   const ctnDom = useRef<HTMLDivElement>(null)
   const mousePos = useRef({ x: 0.5, y: 0.5 })
 
@@ -102,7 +102,7 @@ export default function Iridescence({
     const handleMouseMove = (e: MouseEvent) => {
       const rect = ctn.getBoundingClientRect()
       const x = (e.clientX - rect.left) / rect.width
-      const y = 1.0 - (e.clientY - rect.top) / rect.height
+      const y = 1 - (e.clientY - rect.top) / rect.height
       mousePos.current = { x, y }
       program.uniforms.uMouse.value[0] = x
       program.uniforms.uMouse.value[1] = y
@@ -115,7 +115,7 @@ export default function Iridescence({
       window.removeEventListener('resize', resize)
       if (mouseReact) ctn.removeEventListener('mousemove', handleMouseMove)
       if (gl.canvas.parentNode === ctn) {
-        ctn.removeChild(gl.canvas)
+        gl.canvas.remove()
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext()
     }

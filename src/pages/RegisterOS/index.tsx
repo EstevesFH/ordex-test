@@ -92,7 +92,7 @@ const RegisterOS = () => {
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
 
     const localNome = locations.find(l => l.id === Number(form.localId))?.locationName
@@ -147,13 +147,13 @@ const RegisterOS = () => {
         <form onSubmit={handleSubmit}>
           <S.FormGrid>
             <S.FormGroup>
-              <label>Solicitante</label>
-              <input value={loggedSolicitante} disabled />
+              <label htmlFor="solicitante">Solicitante</label>
+              <input id="solicitante" value={loggedSolicitante} disabled />
             </S.FormGroup>
 
             <S.FormGroup>
-              <label>Local / Setor</label>
-              <select name="localId" value={form.localId} onChange={handleChange} required>
+              <label htmlFor="localId">Local / Setor</label>
+              <select id="localId" name="localId" value={form.localId} onChange={handleChange} required>
                 <option value="">Selecione o local</option>
                 {locations.map(loc => (
                   <option key={loc.id} value={loc.id}>
@@ -164,8 +164,8 @@ const RegisterOS = () => {
             </S.FormGroup>
 
             <S.FormGroup>
-              <label>Prioridade</label>
-              <select name="prioridade" value={form.prioridade} onChange={handleChange} required>
+              <label htmlFor="prioridade">Prioridade</label>
+              <select id="prioridade" name="prioridade" value={form.prioridade} onChange={handleChange} required>
                 <option value="">Defina a urgência</option>
                 <option value="Alta">🔴 Alta</option>
                 <option value="Baixa">🟢 Baixa</option>
@@ -173,8 +173,8 @@ const RegisterOS = () => {
             </S.FormGroup>
 
             <S.FormGroup>
-              <label>Equipamento / Produto</label>
-              <select name="produtoId" value={form.produtoId} onChange={handleChange} required>
+              <label htmlFor="produtoId">Equipamento / Produto</label>
+              <select id="produtoId" name="produtoId" value={form.produtoId} onChange={handleChange} required>
                 <option value="">Selecione o item</option>
                 {products.map(prod => (
                   <option key={prod.id} value={prod.id}>
@@ -186,8 +186,9 @@ const RegisterOS = () => {
           </S.FormGrid>
 
           <S.FormGroup>
-            <label>Descrição do Problema</label>
+            <label htmlFor="descricao">Descrição do Problema</label>
             <textarea
+              id="descricao"
               name="descricao"
               value={form.descricao}
               onChange={handleChange}

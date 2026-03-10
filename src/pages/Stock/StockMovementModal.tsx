@@ -38,7 +38,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
 
     if (quantity <= 0) {
@@ -69,7 +69,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
         newQuantity,
         reason || undefined,
         undefined,
-        getSessionUserId()
+        getSessionUserId() === undefined ? undefined : String(getSessionUserId())
       )
 
       if (result.success) {
@@ -175,8 +175,9 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
         </S.Field>
 
         <S.Field>
-          <label>Motivo</label>
+          <label htmlFor="reason">Motivo</label>
           <textarea
+            id="reason"
             value={reason}
             onChange={e => setReason(e.target.value)}
             rows={3}

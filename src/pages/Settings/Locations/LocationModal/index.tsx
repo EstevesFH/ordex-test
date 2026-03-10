@@ -48,8 +48,9 @@ const LocationModal = ({ mode, location, onClose, onUpdated }: Props) => {
         </S.Title>
 
         <S.Field>
-          <label>Nome do Local</label>
+          <label htmlFor="locationName">Nome do Local</label>
           <input
+            id="locationName"
             value={locationName}
             onChange={e => setLocationName(e.target.value)}
           />
@@ -57,8 +58,9 @@ const LocationModal = ({ mode, location, onClose, onUpdated }: Props) => {
 
         {isEdit && (
           <S.Field>
-            <label>Status</label>
+            <label htmlFor="locationStatus">Status</label>
             <select
+              id="locationStatus"
               value={status}
               onChange={e =>
                 setStatus(e.target.value as 'Ativo' | 'Inativo')

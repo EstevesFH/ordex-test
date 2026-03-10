@@ -211,16 +211,17 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose, onE
                 <S.InvoiceFileName>{asset.invoice_file_name}</S.InvoiceFileName>
                 <S.InvoiceLabel>Arquivo anexado</S.InvoiceLabel>
               </div>
-              <Button
-                as="a"
+              <a
                 href={asset.invoice_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                variant="secondary"
+                style={{ textDecoration: 'none' }}
               >
-                <FiDownload size={16} />
-                Baixar
-              </Button>
+                <Button variant="secondary">
+                  <FiDownload size={16} />
+                  Baixar
+                </Button>
+              </a>
             </S.InvoiceCard>
           ) : (
             <S.UploadArea>
@@ -250,33 +251,39 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose, onE
             Histórico de Manutenções ({historyData?.tickets.length || 0} OSs)
           </S.SectionTitle>
 
-          {loadingHistory ? (
-            <Skeleton count={3} height="60px" />
-          ) : historyData?.tickets && historyData.tickets.length > 0 ? (
-            <S.TicketList>
-              {historyData.tickets.map(ticket => (
-                <S.TicketCard key={ticket.id}>
-                  <S.TicketHeader>
-                    <S.TicketId>OS #{ticket.id}</S.TicketId>
-                    <S.TicketBadge status={ticket.status}>
-                      {ticket.status}
-                    </S.TicketBadge>
-                  </S.TicketHeader>
-                  <S.TicketInfo>
-                    <p><strong>Descrição:</strong> {ticket.descricao}</p>
-                    <p><strong>Solicitante:</strong> {ticket.solicitante}</p>
-                    <p><strong>Tipo:</strong> {ticket.service_type === 'preventive' ? 'Preventiva' : 'Corretiva'}</p>
-                  </S.TicketInfo>
-                  <S.TicketDate>
-                    <FiClock size={14} />
-                    Aberta em {formatDate(ticket.dataabertura)}
-                  </S.TicketDate>
-                </S.TicketCard>
-              ))}
-            </S.TicketList>
-          ) : (
-            <S.EmptyState>Nenhuma manutenção registrada para este ativo.</S.EmptyState>
-          )}
+          {(() => {
+            if (loadingHistory) {
+              return <Skeleton count={3} height="60px" />;
+            }
+            if (historyData?.tickets && historyData.tickets.length > 0) {
+              return (
+                <S.TicketList>
+                  {historyData.tickets.map(ticket => (
+                    <S.TicketCard key={ticket.id}>
+                      <S.TicketHeader>
+                        <S.TicketId>OS #{ticket.id}</S.TicketId>
+                        <S.TicketBadge status={ticket.status}>
+                          {ticket.status}
+                        </S.TicketBadge>
+                      </S.TicketHeader>
+                      <S.TicketInfo>
+                        <p><strong>Descrição:</strong> {ticket.descricao}</p>
+                        <p><strong>Solicitante:</strong> {ticket.solicitante}</p>
+                        <p><strong>Tipo:</strong> {ticket.service_type === 'preventive' ? 'Preventiva' : 'Corretiva'}</p>
+                      </S.TicketInfo>
+                      <S.TicketDate>
+                        <FiClock size={14} />
+                        Aberta em {formatDate(ticket.dataabertura)}
+                      </S.TicketDate>
+                    </S.TicketCard>
+                  ))}
+                </S.TicketList>
+              );
+            }
+            return (
+              <S.EmptyState>Nenhuma manutenção registrada para este ativo.</S.EmptyState>
+            );
+          })()}
         </S.Section>
 
         {asset.notes && (

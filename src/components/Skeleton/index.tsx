@@ -34,7 +34,8 @@ const Skeleton: React.FC<SkeletonProps> = ({
     <>
       {Array.from({ length: count }).map((_, index) => (
         <SkeletonBox
-          key={index}
+          // eslint-disable-next-line react-hooks/purity
+          key={`skeleton-${variant}-${width}-${height}-${borderRadius}-${index}-${Math.random().toString(36).substr(2, 9)}`}
           style={{
             width,
             height,
@@ -67,7 +68,7 @@ export const SkeletonTable: React.FC<{ rows?: number }> = ({ rows = 5 }) => (
   <TableContainer>
     <Skeleton width="100%" height="40px" borderRadius="8px" />
     {Array.from({ length: rows }).map((_, index) => (
-      <TableRow key={index}>
+      <TableRow key={`skeleton-table-row-${rows}-${index}`}>
         <Skeleton width="15%" height="16px" />
         <Skeleton width="25%" height="16px" />
         <Skeleton width="20%" height="16px" />
@@ -80,16 +81,20 @@ export const SkeletonTable: React.FC<{ rows?: number }> = ({ rows = 5 }) => (
 
 export const SkeletonList: React.FC<{ items?: number }> = ({ items = 3 }) => (
   <ListContainer>
-    {Array.from({ length: items }).map((_, index) => (
-      <ListItem key={index}>
-        <Skeleton variant="circular" height="48px" />
-        <div style={{ flex: 1 }}>
-          <Skeleton width="60%" height="18px" />
-          <Skeleton width="80%" height="14px" />
-        </div>
-        <Skeleton width="80px" height="32px" borderRadius="6px" />
-      </ListItem>
-    ))}
+    {Array.from({ length: items }).map((_, index) => {
+      // eslint-disable-next-line react-hooks/purity
+      const key = `skeleton-list-item-${items}-${index}-${Math.random().toString(36).slice(2, 11)}`
+      return (
+        <ListItem key={key}>
+          <Skeleton variant="circular" height="48px" />
+          <div style={{ flex: 1 }}>
+            <Skeleton width="60%" height="18px" />
+            <Skeleton width="80%" height="14px" />
+          </div>
+          <Skeleton width="80px" height="32px" borderRadius="6px" />
+        </ListItem>
+      )
+    })}
   </ListContainer>
 )
 

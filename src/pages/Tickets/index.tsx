@@ -122,6 +122,78 @@ const Tickets = () => {
     return <Loader />
   }
 
+  let tableContent
+  if (error) {
+    tableContent = <S.ErrorMessage>{error}</S.ErrorMessage>
+  } else if (filteredTickets.length === 0) {
+    tableContent = <S.EmptyMessage>Nenhuma OS encontrada</S.EmptyMessage>
+  } else {
+    tableContent = (
+      <>
+        <S.TableWrapper>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Solicitante</th>
+                <th>Local</th>
+                <th>Prioridade</th>
+                <th>Produto</th>
+                <th>Descrição</th>
+                <th>Status</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {paginatedTickets.map(ticket => (
+                <tr key={ticket.id}>
+                  <td>{ticket.id}</td>
+                  <td>{ticket.solicitante}</td>
+                  <td>{ticket.local}</td>
+                  <td>{ticket.prioridade}</td>
+                  <td>{ticket.produto}</td>
+                  <td title={ticket.descricao}>
+                    <S.TruncatedText>{ticket.descricao}</S.TruncatedText>
+                  </td>
+                  <td>
+                    <S.Status status={ticket.status}>
+                      {ticket.status}
+                    </S.Status>
+                  </td>
+                  <td>
+                    <S.Actions>
+                      <button 
+                        onClick={() => openView(ticket)}
+                        aria-label="Visualizar ticket"
+                      >
+                        <FiEye />
+                      </button>
+                      {!isSupervisor && (
+                        <button 
+                          onClick={() => openEdit(ticket)}
+                          aria-label="Editar ticket"
+                        >
+                          <FiEdit />
+                        </button>
+                      )}
+                    </S.Actions>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </S.TableWrapper>
+
+        <Pagination
+          totalItems={filteredTickets.length}
+          onPageChange={setPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      </>
+    )
+  }
+
   return (
     <>
       <S.Header>
@@ -149,74 +221,7 @@ const Tickets = () => {
           <h2>{filteredTickets.length} {filteredTickets.length === 1 ? 'OS encontrada' : 'OS encontradas'}</h2>
         </S.TableHeader>
 
-        {error ? (
-          <S.ErrorMessage>{error}</S.ErrorMessage>
-        ) : filteredTickets.length === 0 ? (
-          <S.EmptyMessage>Nenhuma OS encontrada</S.EmptyMessage>
-        ) : (
-          <>
-            <S.TableWrapper>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Solicitante</th>
-                    <th>Local</th>
-                    <th>Prioridade</th>
-                    <th>Produto</th>
-                    <th>Descrição</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {paginatedTickets.map(ticket => (
-                    <tr key={ticket.id}>
-                      <td>{ticket.id}</td>
-                      <td>{ticket.solicitante}</td>
-                      <td>{ticket.local}</td>
-                      <td>{ticket.prioridade}</td>
-                      <td>{ticket.produto}</td>
-                      <td title={ticket.descricao}>
-                        <S.TruncatedText>{ticket.descricao}</S.TruncatedText>
-                      </td>
-                      <td>
-                        <S.Status status={ticket.status}>
-                          {ticket.status}
-                        </S.Status>
-                      </td>
-                      <td>
-                        <S.Actions>
-                          <button 
-                            onClick={() => openView(ticket)}
-                            aria-label="Visualizar ticket"
-                          >
-                            <FiEye />
-                          </button>
-                          {!isSupervisor && (
-                            <button 
-                              onClick={() => openEdit(ticket)}
-                              aria-label="Editar ticket"
-                            >
-                              <FiEdit />
-                            </button>
-                          )}
-                        </S.Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </S.TableWrapper>
-
-            <Pagination
-              totalItems={filteredTickets.length}
-              onPageChange={setPage}
-              onItemsPerPageChange={handleItemsPerPageChange}
-            />
-          </>
-        )}
+        {tableContent}
       </S.TableCard>
 
       <Filter

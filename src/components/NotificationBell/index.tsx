@@ -297,6 +297,12 @@ const NotificationItem = styled.div<NotificationItemProps>`
   }
 `
 
+const getSeverityBackground = (severity: string) => {
+  if (severity === 'critical') return '#fee2e2';
+  if (severity === 'warning') return '#fef3c7';
+  return '#dbeafe';
+};
+
 const NotificationIcon = styled.div<{ severity: string }>`
   flex-shrink: 0;
   width: 32px;
@@ -305,9 +311,7 @@ const NotificationIcon = styled.div<{ severity: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${props =>
-    props.severity === 'critical' ? '#fee2e2' :
-    props.severity === 'warning' ? '#fef3c7' : '#dbeafe'};
+  background: ${props => getSeverityBackground(props.severity)};
 `
 
 const NotificationContent = styled.div`

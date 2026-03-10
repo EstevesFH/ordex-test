@@ -36,7 +36,7 @@ const ResetPassword: React.FC = () => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setError('')
 
@@ -144,26 +144,28 @@ const ResetPassword: React.FC = () => {
 
         <S.Form onSubmit={handleSubmit}>
           <S.Field>
-            <label>Nova Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-placeholder="Mínimo 8 caracteres"
-              autoFocus
-            />
-          </S.Field>
+  <label htmlFor="new-password">Nova Senha</label>
+  <input
+    id="new-password"
+    type="password"
+    value={password}
+    onChange={e => setPassword(e.target.value)}
+    required
+    placeholder="Mínimo 8 caracteres"
+    autoFocus
+  />
+</S.Field>
 
-          <S.Field>
-            <label>Confirmar Nova Senha</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              required
-              placeholder="Digite a senha novamente"
-            />
+<S.Field>
+  <label htmlFor="confirm-password">Confirmar Nova Senha</label>
+  <input
+    id="confirm-password"
+    type="password"
+    value={confirmPassword}
+    onChange={e => setConfirmPassword(e.target.value)}
+    required
+    placeholder="Digite a senha novamente"
+  />
           </S.Field>
 
           {error && <S.ErrorMessage>{error}</S.ErrorMessage>}

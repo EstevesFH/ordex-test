@@ -49,7 +49,7 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setLoading(true)
 
@@ -88,8 +88,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
 
           <S.FormGrid>
             <S.Field>
-              <label>Nome do Item *</label>
+              <label htmlFor="item_name">Nome do Item *</label>
               <input
+                id="item_name"
                 type="text"
                 name="item_name"
                 value={formData.item_name}
@@ -100,8 +101,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
             </S.Field>
 
             <S.Field>
-              <label>Tipo *</label>
+              <label htmlFor="item_type">Tipo *</label>
               <input
+                id="item_type"
                 type="text"
                 name="item_type"
                 value={formData.item_type}
@@ -112,8 +114,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
             </S.Field>
 
             <S.Field>
-              <label>Quantidade *</label>
+              <label htmlFor="quantity">Quantidade *</label>
               <input
+                id="quantity"
                 type="number"
                 name="quantity"
                 value={formData.quantity}
@@ -124,8 +127,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
             </S.Field>
 
             <S.Field>
-              <label>Quantidade Mínima *</label>
+              <label htmlFor="min_quantity">Quantidade Mínima *</label>
               <input
+                id="min_quantity"
                 type="number"
                 name="min_quantity"
                 value={formData.min_quantity}
@@ -137,8 +141,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
             </S.Field>
 
             <S.Field>
-              <label>Preço Unitário (R$)</label>
+              <label htmlFor="unit_price">Preço Unitário (R$)</label>
               <input
+                id="unit_price"
                 type="number"
                 step="0.01"
                 name="unit_price"
@@ -149,8 +154,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
             </S.Field>
 
             <S.Field>
-              <label>Status *</label>
+              <label htmlFor="status">Status *</label>
               <select
+                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
@@ -166,8 +172,9 @@ const StockItemModal: React.FC<StockItemModalProps> = ({ item, mode, onClose, on
 
         <S.Section>
           <S.Field>
-            <label>Observações</label>
+            <label htmlFor="notes">Observações</label>
             <textarea
+              id="notes"
               name="notes"
               value={formData.notes || ''}
               onChange={handleChange}

@@ -91,13 +91,13 @@ const AccessesSettings = () => {
 
   const filterFields: FilterField[] = [
     { label: 'Nome ou e-mail', type: 'text', value: search, onChange: setSearch },
-    { label: 'Função', type: 'select', value: filterRole, onChange: setFilterRole, options: [{ value: '', label: 'Todas' }, ...roles] },
+    { label: 'Função', type: 'select', value: filterRole, onChange: setFilterRole, options: [{ value: '', label: 'Todas' }, ...roles.map(role => ({ value: role, label: role }))] },
     {
       label: 'Status',
       type: 'select',
       value: filterStatus,
       onChange: setFilterStatus,
-      options: [{ value: '', label: 'Todos' }, ...statusOptions],
+      options: [{ value: '', label: 'Todos' }, ...statusOptions.map(status => ({ value: status, label: status }))],
     },
   ]
 

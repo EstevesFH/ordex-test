@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 
 interface SidebarContextData {
   isOpen: boolean
@@ -11,9 +11,10 @@ const SidebarContext = createContext<SidebarContextData>(
 
 export const SidebarProvider = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const value = useMemo(() => ({ isOpen, setIsOpen }), [isOpen, setIsOpen])
 
   return (
-    <SidebarContext.Provider value={{ isOpen, setIsOpen }}>
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   )

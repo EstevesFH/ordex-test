@@ -77,7 +77,7 @@ export const AppLayout: FC = () => {
                 $isActive={isActive}
                 $isOpen={sidebarOpen}
                 onClick={() => navigate(item.path)}
-                title={!sidebarOpen ? item.label : ''}
+                title={sidebarOpen ? '' : item.label}
               >
                 <Icon size={20} />
                 {sidebarOpen && <span>{item.label}</span>}

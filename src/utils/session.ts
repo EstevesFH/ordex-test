@@ -4,7 +4,7 @@ export interface SessionUser {
   id: string
   username: string
   name: string
-  role: AppRole | string
+  role: AppRole
   lastActive: number
 }
 

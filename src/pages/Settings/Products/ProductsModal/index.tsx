@@ -80,16 +80,18 @@ const ProductsModal = ({ product, mode, onClose, onUpdated }: ProductsModalProps
         </S.Title>
 
         <S.Field>
-          <label>Nome do Produto</label>
+          <label htmlFor="productName">Nome do Produto</label>
           <input
+            id="productName"
             value={productName}
             onChange={e => setProductName(e.target.value)}
           />
         </S.Field>
 
         <S.Field>
-          <label>Tipo do Produto</label>
+          <label htmlFor="productType">Tipo do Produto</label>
           <select
+            id="productType"
             value={productType}
             onChange={e => setProductType(e.target.value)}
           >
@@ -101,8 +103,9 @@ const ProductsModal = ({ product, mode, onClose, onUpdated }: ProductsModalProps
 
         {isEdit && (
           <S.Field>
-            <label>Status</label>
+            <label htmlFor="status">Status</label>
             <select
+              id="status"
               value={status}
               onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}
             >

@@ -45,7 +45,7 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
         new Set(
           loadedMovements
             .map(m => m.performed_by)
-            .filter((value): value is number => typeof value === 'number')
+            .filter((value): value is Exclude<typeof value, null | undefined> => typeof value === 'number')
         )
       )
 
@@ -73,7 +73,7 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
 
   const rows = useMemo(() => {
     return movements.map(movement => {
-      const userLabel = movement.performed_by
+      const userLabel = typeof movement.performed_by === 'number'
         ? userNamesById[movement.performed_by] || `Usuário #${movement.performed_by}`
         : 'Sistema'
 
@@ -86,6 +86,52 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
     })
   }, [movements, userNamesById])
 
+  let content: React.ReactNode;
+  if (loading) {
+    content = <S.StateMessage>Carregando movimentações...</S.StateMessage>;
+  } else if (error) {
+    content = <S.ErrorMessage>{error}</S.ErrorMessage>;
+  } else if (rows.length === 0) {
+    content = <S.StateMessage>Nenhuma movimentação registrada para este item.</S.StateMessage>;
+  } else {
+    content = (
+      <S.TableWrapper>
+        <table>
+          <thead>
+            <tr>
+              <th>Data e hora</th>
+              <th>Tipo</th>
+              <th>Quantidade</th>
+              <th>Quem fez</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(row => (
+              <tr key={row.id}>
+                <td>
+                  <S.InlineInfo>
+                    <FiClock size={14} />
+                    {row.dateLabel}
+                  </S.InlineInfo>
+                </td>
+                <td>
+                  <S.TypeBadge $type={row.movement_type}>{row.typeLabel}</S.TypeBadge>
+                </td>
+                <td>{row.quantity}</td>
+                <td>
+                  <S.InlineInfo>
+                    <FiUser size={14} />
+                    {row.userLabel}
+                  </S.InlineInfo>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </S.TableWrapper>
+    );
+  }
+
   return (
     <Modal onClose={onClose} maxWidth="760px">
       <S.ModalHeader>
@@ -97,49 +143,7 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
           <FiX size={22} />
         </S.CloseButton>
       </S.ModalHeader>
-
-      {loading ? (
-        <S.StateMessage>Carregando movimentações...</S.StateMessage>
-      ) : error ? (
-        <S.ErrorMessage>{error}</S.ErrorMessage>
-      ) : rows.length === 0 ? (
-        <S.StateMessage>Nenhuma movimentação registrada para este item.</S.StateMessage>
-      ) : (
-        <S.TableWrapper>
-          <table>
-            <thead>
-              <tr>
-                <th>Data e hora</th>
-                <th>Tipo</th>
-                <th>Quantidade</th>
-                <th>Quem fez</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(row => (
-                <tr key={row.id}>
-                  <td>
-                    <S.InlineInfo>
-                      <FiClock size={14} />
-                      {row.dateLabel}
-                    </S.InlineInfo>
-                  </td>
-                  <td>
-                    <S.TypeBadge $type={row.movement_type}>{row.typeLabel}</S.TypeBadge>
-                  </td>
-                  <td>{row.quantity}</td>
-                  <td>
-                    <S.InlineInfo>
-                      <FiUser size={14} />
-                      {row.userLabel}
-                    </S.InlineInfo>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </S.TableWrapper>
-      )}
+      {content}
     </Modal>
   )
 }

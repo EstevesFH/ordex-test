@@ -76,7 +76,7 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
     setSpecs(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setLoading(true)
 
@@ -129,8 +129,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
 
           <S.FormGrid>
             <S.Field>
-              <label>Nome do Ativo *</label>
+              <label htmlFor="asset_name">Nome do Ativo *</label>
               <input
+                id="asset_name"
                 type="text"
                 name="asset_name"
                 value={formData.asset_name}
@@ -141,8 +142,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
             </S.Field>
 
             <S.Field>
-              <label>Tipo *</label>
+              <label htmlFor="asset_type">Tipo *</label>
               <input
+                id="asset_type"
                 type="text"
                 name="asset_type"
                 value={formData.asset_type}
@@ -153,8 +155,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
             </S.Field>
 
             <S.Field>
-              <label>Categoria *</label>
+              <label htmlFor="asset_category">Categoria *</label>
               <select
+                id="asset_category"
                 name="asset_category"
                 value={formData.asset_category}
                 onChange={handleChange}
@@ -166,8 +169,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
             </S.Field>
 
             <S.Field>
-              <label>Status *</label>
+              <label htmlFor="status">Status *</label>
               <select
+                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
@@ -188,8 +192,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
 
             <S.FormGrid>
               <S.Field>
-                <label>Nº de Série</label>
+                <label htmlFor="serial_number">Nº de Série</label>
                 <input
+                  id="serial_number"
                   type="text"
                   name="serial_number"
                   value={formData.serial_number || ''}
@@ -199,8 +204,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Fabricante</label>
+                <label htmlFor="manufacturer">Fabricante</label>
                 <input
+                  id="manufacturer"
                   type="text"
                   name="manufacturer"
                   value={formData.manufacturer || ''}
@@ -210,8 +216,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Modelo</label>
+                <label htmlFor="model">Modelo</label>
                 <input
+                  id="model"
                   type="text"
                   name="model"
                   value={formData.model || ''}
@@ -221,8 +228,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Data de Compra</label>
+                <label htmlFor="purchase_date">Data de Compra</label>
                 <input
+                  id="purchase_date"
                   type="date"
                   name="purchase_date"
                   value={formData.purchase_date || ''}
@@ -231,8 +239,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Fim da Garantia</label>
+                <label htmlFor="warranty_expiry">Fim da Garantia</label>
                 <input
+                  id="warranty_expiry"
                   type="date"
                   name="warranty_expiry"
                   value={formData.warranty_expiry || ''}
@@ -241,8 +250,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Preço (R$)</label>
+                <label htmlFor="unit_price_durable">Preço (R$)</label>
                 <input
+                  id="unit_price_durable"
                   type="number"
                   step="0.01"
                   name="unit_price"
@@ -254,9 +264,10 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
             </S.FormGrid>
 
             <S.SubSection>
-              <label>Especificações Técnicas</label>
+              <label htmlFor="cpu">Especificações Técnicas</label>
               <S.SpecGrid>
                 <input
+                  id="cpu"
                   type="text"
                   name="cpu"
                   value={specs.cpu}
@@ -264,6 +275,7 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
                   placeholder="CPU (ex: Intel i7-1165G7)"
                 />
                 <input
+                  id="ram"
                   type="text"
                   name="ram"
                   value={specs.ram}
@@ -271,6 +283,7 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
                   placeholder="RAM (ex: 16GB DDR4)"
                 />
                 <input
+                  id="disk"
                   type="text"
                   name="disk"
                   value={specs.disk}
@@ -278,6 +291,7 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
                   placeholder="Disco (ex: 512GB NVMe SSD)"
                 />
                 <input
+                  id="screen"
                   type="text"
                   name="screen"
                   value={specs.screen}
@@ -295,8 +309,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
 
             <S.FormGrid>
               <S.Field>
-                <label>Quantidade *</label>
+                <label htmlFor="quantity">Quantidade *</label>
                 <input
+                  id="quantity"
                   type="number"
                   name="quantity"
                   value={formData.quantity || 0}
@@ -307,8 +322,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Quantidade Mínima *</label>
+                <label htmlFor="min_quantity">Quantidade Mínima *</label>
                 <input
+                  id="min_quantity"
                   type="number"
                   name="min_quantity"
                   value={formData.min_quantity || 0}
@@ -319,8 +335,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
               </S.Field>
 
               <S.Field>
-                <label>Preço Unitário (R$)</label>
+                <label htmlFor="unit_price_consumable">Preço Unitário (R$)</label>
                 <input
+                  id="unit_price_consumable"
                   type="number"
                   step="0.01"
                   name="unit_price"
@@ -335,8 +352,9 @@ const AssetModal: React.FC<AssetModalProps> = ({ asset, mode, onClose, onSuccess
 
         <S.Section>
           <S.Field>
-            <label>Observações</label>
+            <label htmlFor="notes">Observações</label>
             <textarea
+              id="notes"
               name="notes"
               value={formData.notes || ''}
               onChange={handleChange}

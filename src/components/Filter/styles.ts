@@ -13,7 +13,7 @@ export const Overlay = styled.div`
 `
 
 export const Modal = styled.div`
-  background: ${ds.colors.backgroundCard};
+  background: ${ds.colors.background};
   border: 1px solid ${ds.colors.border};
   border-radius: ${ds.radius.lg};
   width: 100%;
@@ -47,7 +47,7 @@ export const CloseButton = styled.button`
   cursor: pointer;
   width: 32px;
   height: 32px;
-  border-radius: ${ds.radius.sm};
+  border-radius: ${ds.radius.md};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,7 +88,7 @@ export const Field = styled.div`
     transition: ${ds.transitions.fast};
 
     &::placeholder {
-      color: ${ds.colors.textMuted};
+      color: ${ds.colors.textSecondary};
     }
 
     &:focus {
@@ -107,5 +107,5 @@ export const Footer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: ${ds.spacing.sm};
-  margin-top: ${ds.spacing.xs};
+  margin-top: ${ds.spacing.sm};
 `

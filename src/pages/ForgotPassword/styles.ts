@@ -14,9 +14,9 @@ export const Container = styled.div`
 export const Card = styled.div`
   width: 100%;
   max-width: 520px;
-  background: ${ds.colors.backgroundCard};
+  background: ${ds.colors.background};
   border: 1px solid ${ds.colors.border};
-  border-radius: ${ds.radius.xl};
+  border-radius: ${ds.radius.lg};
   padding: ${ds.spacing.xl};
   box-shadow: 0 18px 40px rgba(2, 6, 23, 0.15);
   display: flex;
@@ -36,7 +36,7 @@ export const IconHeader = styled.div`
 `
 
 export const SuccessIcon = styled.div`
-  margin-bottom: ${ds.spacing.xs};
+  margin-bottom: ${ds.spacing.sm};
 `
 
 export const Title = styled.h1`
@@ -109,7 +109,7 @@ export const InfoBox = styled.div`
   padding: ${ds.spacing.md};
 
   p {
-    margin: 0 0 ${ds.spacing.xs};
+    margin: 0 0 ${ds.spacing.sm};
     color: ${ds.colors.textMain};
   }
 

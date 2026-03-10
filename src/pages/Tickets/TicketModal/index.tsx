@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Ticket } from '../../types'
+import type { Ticket } from '../../../types'
 import { supabase } from '@/services/supabase'
 import * as S from './styles'
 import { Button } from '@/components/Button'
@@ -49,34 +49,35 @@ const TicketModal = ({ ticket, mode, onClose, onUpdated }: TicketModalProps) => 
 
         <S.Grid>
           <S.Field>
-            <label>Solicitante</label>
-            <input value={ticket.solicitante} disabled />
+            <label htmlFor="solicitante">Solicitante</label>
+            <input id="solicitante" value={ticket.solicitante} disabled />
           </S.Field>
 
           <S.Field>
-            <label>Local</label>
-            <input value={ticket.local} disabled />
+            <label htmlFor="local">Local</label>
+            <input id="local" value={ticket.local} disabled />
           </S.Field>
 
           <S.Field>
-            <label>Produto</label>
-            <input value={ticket.produto} disabled />
+            <label htmlFor="produto">Produto</label>
+            <input id="produto" value={ticket.produto} disabled />
           </S.Field>
 
           <S.Field>
-            <label>Prioridade</label>
-            <input value={ticket.prioridade} disabled />
+            <label htmlFor="prioridade">Prioridade</label>
+            <input id="prioridade" value={ticket.prioridade} disabled />
           </S.Field>
 
           <S.Field full>
-            <label>Descrição</label>
-            <textarea value={ticket.descricao} disabled />
+            <label htmlFor="descricao">Descrição</label>
+            <textarea id="descricao" value={ticket.descricao} disabled />
           </S.Field>
 
           <S.Field>
-            <label>Status</label>
+            <label htmlFor="status">Status</label>
             {isEdit ? (
               <select
+                id="status"
                 value={status}
                 onChange={(e) =>
                   setStatus(e.target.value as Ticket['status'])
@@ -88,13 +89,14 @@ const TicketModal = ({ ticket, mode, onClose, onUpdated }: TicketModalProps) => 
                 <option value="Finalizado">Finalizado</option>
               </select>
             ) : (
-              <input value={ticket.status} disabled />
+              <input id="status" value={ticket.status} disabled />
             )}
           </S.Field>
 
           <S.Field full>
-            <label>Retorno</label>
+            <label htmlFor="retorno">Retorno</label>
             <textarea
+              id="retorno"
               value={retorno}
               disabled={!isEdit}
               onChange={(e) => setRetorno(e.target.value)}

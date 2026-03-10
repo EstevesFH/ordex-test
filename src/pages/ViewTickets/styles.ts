@@ -116,34 +116,34 @@ export const TableWrapper = styled.div`
   }
 `
 
+const getStatusBackground = (status: string) => {
+  if (status === 'Aberto') return '#fef2f2';
+  if (status === 'Em Andamento') return '#eff6ff';
+  if (status === 'Aguardando') return '#fffbeb';
+  return '#ecfdf5';
+};
+
+const getStatusColor = (status: string) => {
+  if (status === 'Aberto') return '#b91c1c';
+  if (status === 'Em Andamento') return '#1d4ed8';
+  if (status === 'Aguardando') return '#b45309';
+  return '#047857';
+};
+
+const getStatusBorderColor = (status: string) => {
+  if (status === 'Aberto') return '#fecaca';
+  if (status === 'Em Andamento') return '#bfdbfe';
+  if (status === 'Aguardando') return '#fde68a';
+  return '#a7f3d0';
+};
+
 export const Status = styled.span<{ status: string }>`
   display: inline-flex;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid;
   font-weight: ${ds.typography.weight.semibold};
-  background: ${({ status }) =>
-    status === 'Aberto'
-      ? '#fef2f2'
-      : status === 'Em Andamento'
-        ? '#eff6ff'
-        : status === 'Aguardando'
-          ? '#fffbeb'
-          : '#ecfdf5'};
-  color: ${({ status }) =>
-    status === 'Aberto'
-      ? '#b91c1c'
-      : status === 'Em Andamento'
-        ? '#1d4ed8'
-        : status === 'Aguardando'
-          ? '#b45309'
-          : '#047857'};
-  border-color: ${({ status }) =>
-    status === 'Aberto'
-      ? '#fecaca'
-      : status === 'Em Andamento'
-        ? '#bfdbfe'
-        : status === 'Aguardando'
-          ? '#fde68a'
-          : '#a7f3d0'};
+  background: ${({ status }) => getStatusBackground(status)};
+  color: ${({ status }) => getStatusColor(status)};
+  border-color: ${({ status }) => getStatusBorderColor(status)};
 `

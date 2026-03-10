@@ -102,6 +102,27 @@ export const TableWrapper = styled.div`
   }
 `
 
+const getBadgeBackground = (status: string) => {
+  if (status === 'Aberto') return '#fef2f2';
+  if (status === 'Em Andamento') return '#eff6ff';
+  if (status === 'Aguardando') return '#fffbeb';
+  return '#ecfdf5';
+};
+
+const getBadgeColor = (status: string) => {
+  if (status === 'Aberto') return '#b91c1c';
+  if (status === 'Em Andamento') return '#1d4ed8';
+  if (status === 'Aguardando') return '#b45309';
+  return '#047857';
+};
+
+const getBadgeBorder = (status: string) => {
+  if (status === 'Aberto') return '#fecaca';
+  if (status === 'Em Andamento') return '#bfdbfe';
+  if (status === 'Aguardando') return '#fde68a';
+  return '#a7f3d0';
+};
+
 export const Badge = styled.span<{ status: string }>`
   display: inline-flex;
   align-items: center;
@@ -110,30 +131,9 @@ export const Badge = styled.span<{ status: string }>`
   font-size: 0.75rem;
   font-weight: 600;
 
-  background: ${({ status }) =>
-    status === 'Aberto'
-      ? '#fef2f2'
-      : status === 'Em Andamento'
-        ? '#eff6ff'
-        : status === 'Aguardando'
-          ? '#fffbeb'
-          : '#ecfdf5'};
+  background: ${({ status }) => getBadgeBackground(status)};
 
-  color: ${({ status }) =>
-    status === 'Aberto'
-      ? '#b91c1c'
-      : status === 'Em Andamento'
-        ? '#1d4ed8'
-        : status === 'Aguardando'
-          ? '#b45309'
-          : '#047857'};
+  color: ${({ status }) => getBadgeColor(status)};
 
-  border: 1px solid ${({ status }) =>
-    status === 'Aberto'
-      ? '#fecaca'
-      : status === 'Em Andamento'
-        ? '#bfdbfe'
-        : status === 'Aguardando'
-          ? '#fde68a'
-          : '#a7f3d0'};
+  border: 1px solid ${({ status }) => getBadgeBorder(status)};
 `

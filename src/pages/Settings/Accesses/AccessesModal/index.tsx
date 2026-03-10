@@ -67,18 +67,18 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
         <S.Title>{isEdit ? 'Editar Acesso (Auth)' : 'Novo Acesso (Auth)'}</S.Title>
 
         <S.Field>
-          <label>Nome</label>
-          <input value={name} onChange={e => setName(e.target.value)} />
+          <label htmlFor="accesses-name">Nome</label>
+          <input id="accesses-name" value={name} onChange={e => setName(e.target.value)} />
         </S.Field>
 
         <S.Field>
-          <label>E-mail</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
+          <label htmlFor="accesses-email">E-mail</label>
+          <input id="accesses-email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
         </S.Field>
 
         <S.Field>
-          <label>Função</label>
-          <select value={role} onChange={e => setRole(e.target.value)}>
+          <label htmlFor="accesses-role">Função</label>
+          <select id="accesses-role" value={role} onChange={e => setRole(e.target.value)}>
             <option value="Administrador">Administrador</option>
             <option value="Supervisor">Supervisor</option>
             <option value="Operador">Operador</option>
@@ -87,8 +87,8 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
 
         {isEdit && (
           <S.Field>
-            <label>Status</label>
-            <select value={status} onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}>
+            <label htmlFor="accesses-status">Status</label>
+            <select id="accesses-status" value={status} onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}>
               <option value="Ativo">Ativo</option>
               <option value="Inativo">Inativo</option>
             </select>
