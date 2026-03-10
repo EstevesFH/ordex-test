@@ -79,6 +79,19 @@ const AccessesSettings = () => {
     }
   }
 
+  const handleResetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+
+    if (error) {
+      alert('Erro ao enviar e-mail de redefinição de senha')
+      return
+    }
+
+    alert(`E-mail de redefinição enviado para ${email}`)
+  }
+
   const filteredAccesses = accesses
     .filter(a =>
       (a.name.toLowerCase().includes(search.toLowerCase()) || a.email.toLowerCase().includes(search.toLowerCase())) &&
