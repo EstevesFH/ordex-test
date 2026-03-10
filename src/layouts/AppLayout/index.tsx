@@ -1,7 +1,13 @@
-import { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { FiHome, FiClipboard, FiSettings, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
-import * as S from './styles';
+import { FC, useState, useEffect, useCallback, useMemo } from 'react'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { FiHome, FiClipboard, FiSettings, FiLogOut, FiMenu, FiX, FiBox, FiEdit3 } from 'react-icons/fi'
+import * as S from './styles'
+
+type AppRole = 'Administrador' | 'Operador'
+
+interface SessionUser {
+  role: AppRole | string
+}
 
 export const AppLayout: FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
@@ -33,11 +39,27 @@ export const AppLayout: FC = () => {
     })
   }, [])
 
-  const menuItems = useMemo(() => [
-    { icon: FiHome, label: 'Dashboard', path: '/dashboard' },
-    { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
-    { icon: FiSettings, label: 'Configurações', path: '/settings' },
-  ], []);
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('user')
+    navigate('/login', { replace: true })
+  }, [navigate])
+
+  const menuItems = useMemo(() => {
+    if (role === 'Operador') {
+      return [
+        { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
+        { icon: FiEdit3, label: 'Registrar OS', path: '/register' },
+      ]
+    }
+
+    return [
+      { icon: FiHome, label: 'Dashboard', path: '/dashboard' },
+      { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
+      { icon: FiEdit3, label: 'Registrar OS', path: '/register' },
+      { icon: FiBox, label: 'Estoque', path: '/stock' },
+      { icon: FiSettings, label: 'Configurações', path: '/settings/locations' },
+    ]
+  }, [role])
 
   return (
     <S.Wrapper>
@@ -69,7 +91,7 @@ export const AppLayout: FC = () => {
         </S.Nav>
 
         <S.Footer>
-          <S.LogoutButton $isOpen={sidebarOpen} onClick={() => navigate('/login')}>
+          <S.LogoutButton $isOpen={sidebarOpen} onClick={handleLogout}>
             <FiLogOut size={20} />
             {sidebarOpen && <span>Sair</span>}
           </S.LogoutButton>

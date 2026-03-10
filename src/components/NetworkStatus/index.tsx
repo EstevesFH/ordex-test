@@ -1,6 +1,6 @@
 import React from 'react'
-import { useNetworkStatus } from '@/hooks/useNetworkStatus'
-import Maintenance from '@/pages/Maintenance'
+import { useNetworkStatus } from '../../hooks/useNetworkStatus'
+import Maintenance from '../../pages/public/Maintenance'
 
 interface NetworkStatusProps {
   children: React.ReactNode

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/services/supabase'
+import { supabase } from '../services/supabase'
 import type { StockItem, StockItemFormData, StockMovement } from '../types'
 
 export const useStockItems = () => {

@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
-import Maintenance from '@/pages/Maintenance'
+import Maintenance from '../../pages/public/Maintenance'
 
 interface Props {
   children: ReactNode

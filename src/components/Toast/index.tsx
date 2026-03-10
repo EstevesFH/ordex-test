@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 import { FiCheckCircle, FiXCircle, FiAlertTriangle, FiInfo, FiX } from 'react-icons/fi'
 
 const ToastContainer: React.FC = () => {

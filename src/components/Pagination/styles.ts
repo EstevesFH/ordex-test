@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../styles/designSystem'
 
 export const PaginationContainer = styled.div`
   margin-top: ${ds.spacing.md};

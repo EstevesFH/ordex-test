@@ -1,24 +1,24 @@
 import { Routes, Route } from 'react-router-dom';
 
-import { PublicLayout } from '@/layouts/PublicLayout';
-import { AppLayout } from '@/layouts/AppLayout';
+import { PublicLayout } from '../layouts/PublicLayout';
+import { AppLayout } from '../layouts/AppLayout';
 
-import { HomePage } from '@/pages/Home';
-import { Login } from '@/pages/Login';
-import { RegisterOS } from '@/pages/RegisterOS';
-import { ViewTickets } from '@/pages/ViewTickets';
-import { ForgotPassword } from '@/pages/ForgotPassword';
-import { ResetPassword } from '@/pages/ResetPassword';
+import { HomePage } from '../pages/public/Home';
+import { Login } from '../pages/public/Login';
+import { RegisterOS } from '../pages/public/RegisterOS';
+import { ViewTickets } from '../pages/public/ViewTickets';
+import { ForgotPassword } from '../pages/public/ForgotPassword';
+import { ResetPassword } from '../pages/public/ResetPassword';
 
-import { Dashboard } from '@/pages/Dashboard';
-import { Tickets } from '@/pages/Tickets';
-import { Stock } from '@/pages/Stock';
+import { Dashboard } from '../pages/private/Dashboard';
+import { Tickets } from '../pages/private/Tickets';
+import { Stock } from '../pages/private/Stock';
 
-import { Settings } from '@/pages/Settings';
-import { UsersSettings } from '@/pages/Settings/Users';
-import { LocationsSettings } from '@/pages/Settings/Locations';
-import { ProductsSettings } from '@/pages/Settings/Products';
-import { AccessesSettings } from '@/pages/Settings/Accesses';
+import { Settings } from '../pages/private/Settings';
+import { UsersSettings } from '../pages/private/Settings/Users';
+import { LocationsSettings } from '../pages/private/Settings/Locations';
+import { ProductsSettings } from '../pages/private/Settings/Products';
+import { AccessesSettings } from '../pages/private/Settings/Accesses';
 
 const AppRoutes = () => {
   return (
