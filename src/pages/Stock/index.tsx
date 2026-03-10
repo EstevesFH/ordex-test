@@ -12,6 +12,7 @@ import StockItemModal from './StockItemModal'
 import StockMovementModal from './StockMovementModal'
 import StockMovementsHistoryModal from './StockMovementsHistoryModal'
 import * as S from './styles'
+import { getSessionUser } from '@/utils/session'
 
 const Stock: React.FC = () => {
   const { stockItems, loading, fetchStockItems, getLowStockItems } = useStockItems()
@@ -27,6 +28,7 @@ const Stock: React.FC = () => {
 
   const [selectedItem, setSelectedItem] = useState<StockItem | null>(null)
   const [mode, setMode] = useState<'view' | 'edit' | 'create' | 'movement' | 'history'>('view')
+  const isSupervisor = getSessionUser()?.role === 'Supervisor'
 
   useEffect(() => {
     fetchStockItems()
@@ -110,10 +112,12 @@ const Stock: React.FC = () => {
     <>
       <S.Header>
         <h1>Estoque Inteligente</h1>
-        <Button onClick={openCreate}>
-          <FiPlus size={18} />
-          Novo Item
-        </Button>
+        {!isSupervisor && (
+          <Button onClick={openCreate}>
+            <FiPlus size={18} />
+            Novo Item
+          </Button>
+        )}
       </S.Header>
 
       {/* Alerta de Estoque Crítico */}
@@ -224,15 +228,19 @@ const Stock: React.FC = () => {
                         </td>
                         <td>
                           <S.Actions>
-                            <S.ActionButton onClick={() => openMovement(item)} title="Movimentar">
-                              <FiTrendingUp size={16} />
-                            </S.ActionButton>
+                            {!isSupervisor && (
+                              <S.ActionButton onClick={() => openMovement(item)} title="Movimentar">
+                                <FiTrendingUp size={16} />
+                              </S.ActionButton>
+                            )}
                             <S.ActionButton onClick={() => openHistory(item)} title="Ver movimentações">
                               <FiClock size={16} />
                             </S.ActionButton>
-                            <S.ActionButton onClick={() => openEdit(item)} title="Editar">
-                              <FiEdit size={16} />
-                            </S.ActionButton>
+                            {!isSupervisor && (
+                              <S.ActionButton onClick={() => openEdit(item)} title="Editar">
+                                <FiEdit size={16} />
+                              </S.ActionButton>
+                            )}
                           </S.Actions>
                         </td>
                       </tr>

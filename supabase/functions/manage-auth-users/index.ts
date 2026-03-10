@@ -6,16 +6,46 @@ const corsHeaders = {
 }
 
 type Status = 'Ativo' | 'Inativo'
+type Role = 'Administrador' | 'Supervisor' | 'Operador'
 
-const mapUser = (user: any) => ({
+type Profile = {
+  id: string
+  email: string | null
+  name: string | null
+  role: Role | null
+  status: Status | null
+}
+
+const mapUser = (user: any, profile?: Profile) => ({
   id: user.id,
-  email: user.email || '',
-  name: user.user_metadata?.name || user.email || 'Usuário',
-  role: user.app_metadata?.role || 'Operador',
-  status: (user.app_metadata?.status || 'Ativo') as Status,
+  email: profile?.email || user.email || '',
+  name: profile?.name || user.user_metadata?.name || user.email || 'Usuário',
+  role: profile?.role || user.app_metadata?.role || 'Operador',
+  status: (profile?.status || user.app_metadata?.status || 'Ativo') as Status,
   created_at: user.created_at,
   last_sign_in_at: user.last_sign_in_at,
 })
+
+const fetchProfilesMap = async (admin: ReturnType<typeof createClient>, ids: string[]) => {
+  if (ids.length === 0) return new Map<string, Profile>()
+
+  const { data, error } = await admin
+    .from('profiles')
+    .select('id, email, name, role, status')
+    .in('id', ids)
+
+  if (error) throw error
+
+  return new Map((data || []).map(profile => [profile.id as string, profile as Profile]))
+}
+
+const upsertProfile = async (
+  admin: ReturnType<typeof createClient>,
+  profile: { id: string; name: string; email: string; role: string; status: Status }
+) => {
+  const { error } = await admin.from('profiles').upsert(profile, { onConflict: 'id' })
+  if (error) throw error
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -50,7 +80,13 @@ Deno.serve(async (req) => {
       })
     }
 
-    const requesterRole = requesterData.user.app_metadata?.role
+    const { data: requesterProfile } = await admin
+      .from('profiles')
+      .select('role')
+      .eq('id', requesterData.user.id)
+      .maybeSingle()
+
+    const requesterRole = requesterProfile?.role || requesterData.user.app_metadata?.role
     if (requesterRole !== 'Administrador') {
       return new Response(JSON.stringify({ error: 'Sem permissão para gerenciar usuários' }), {
         status: 403,
@@ -65,14 +101,17 @@ Deno.serve(async (req) => {
       const { data, error } = await admin.auth.admin.listUsers()
       if (error) throw error
 
-      return new Response(JSON.stringify({ users: data.users.map(mapUser) }), {
+      const profilesMap = await fetchProfilesMap(admin, data.users.map(user => user.id))
+
+      return new Response(JSON.stringify({ users: data.users.map(user => mapUser(user, profilesMap.get(user.id))) }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
     if (action === 'create') {
-      const { name, email, role } = body as { name: string; email: string; role: string }
+      const { name, email, role } = body as { name: string; email: string; role: Role }
+      const userRole = role || 'Operador'
       const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
         data: { name },
       })
@@ -83,13 +122,21 @@ Deno.serve(async (req) => {
         await admin.auth.admin.updateUserById(data.user.id, {
           app_metadata: {
             ...(data.user.app_metadata || {}),
-            role: role || 'Operador',
+            role: userRole,
             status: 'Ativo',
           },
           user_metadata: {
             ...(data.user.user_metadata || {}),
             name,
           },
+        })
+
+        await upsertProfile(admin, {
+          id: data.user.id,
+          name,
+          email,
+          role: userRole,
+          status: 'Ativo',
         })
       }
 
@@ -104,7 +151,7 @@ Deno.serve(async (req) => {
         id: string
         name: string
         email: string
-        role: string
+        role: Role
         status: Status
       }
 
@@ -120,6 +167,14 @@ Deno.serve(async (req) => {
       })
 
       if (error) throw error
+
+      await upsertProfile(admin, {
+        id,
+        name,
+        email,
+        role,
+        status,
+      })
 
       return new Response(JSON.stringify({ user: mapUser(data.user) }), {
         status: 200,

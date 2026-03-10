@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { FiMail, FiLock } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { getLandingByRole, type AppRole } from '@/utils/session'
 import Button from '@/components/Button'
 import * as S from './styles'
-
-type AppRole = 'Administrador' | 'Operador'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -24,7 +23,7 @@ const Login = () => {
     const fifteenMinutes = 15 * 60 * 1000
 
     if (now - (user.lastActive || now) < fifteenMinutes) {
-      navigate(user.role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
+      navigate(getLandingByRole(user.role), { replace: true })
     }
   }, [navigate])
 
@@ -44,9 +43,16 @@ const Login = () => {
         return
       }
 
-      const role = ((signInData.user.app_metadata?.role as string) || 'Operador') as AppRole
-      const status = ((signInData.user.app_metadata?.status as string) || 'Ativo').toLowerCase()
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('name, role, status')
+        .eq('id', signInData.user.id)
+        .maybeSingle()
+
+      const role = ((profileData?.role as string) || (signInData.user.app_metadata?.role as string) || 'Operador') as AppRole
+      const status = ((profileData?.status as string) || (signInData.user.app_metadata?.status as string) || 'Ativo').toLowerCase()
       const displayName =
+        (profileData?.name as string) ||
         (signInData.user.user_metadata?.name as string) ||
         (signInData.user.email?.split('@')[0] as string) ||
         'Usuário'
@@ -68,7 +74,7 @@ const Login = () => {
         }),
       )
 
-      navigate(role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
+      navigate(getLandingByRole(role), { replace: true })
     } catch (err) {
       console.error(err)
       setError('Erro ao autenticar. Tente novamente.')

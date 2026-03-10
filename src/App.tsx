@@ -13,30 +13,7 @@ import { Login } from './pages/Login'
 import { RegisterOS } from './pages/RegisterOS'
 import { ResetPassword } from './pages/ResetPassword'
 import { designSystem } from './styles/designSystem'
-
-type AppRole = 'Administrador' | 'Operador'
-
-interface SessionUser {
-  id: number
-  username: string
-  name: string
-  role: AppRole | string
-  lastActive: number
-}
-
-const getSessionUser = (): SessionUser | null => {
-  const raw = localStorage.getItem('user')
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as SessionUser
-  } catch {
-    localStorage.removeItem('user')
-    return null
-  }
-}
-
-const getLandingByRole = (role: string) => (role === 'Operador' ? '/tickets' : '/dashboard')
+import { getLandingByRole, getSessionUser, type AppRole } from './utils/session'
 
 const PublicOnlyRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = getSessionUser()
@@ -128,7 +105,7 @@ const App: FC = () => (
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['Administrador']}>
+          <ProtectedRoute allowedRoles={['Administrador', 'Supervisor']}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -137,7 +114,7 @@ const App: FC = () => (
       <Route
         path="/stock"
         element={
-          <ProtectedRoute allowedRoles={['Administrador']}>
+          <ProtectedRoute allowedRoles={['Administrador', 'Supervisor']}>
             <Stock />
           </ProtectedRoute>
         }
@@ -160,7 +137,7 @@ const App: FC = () => (
       <Route
         path="/tickets"
         element={
-          <ProtectedRoute allowedRoles={['Administrador', 'Operador']}>
+          <ProtectedRoute allowedRoles={['Administrador', 'Supervisor', 'Operador']}>
             <Tickets />
           </ProtectedRoute>
         }

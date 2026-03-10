@@ -1,30 +1,16 @@
-import { type FC, useState, useEffect, useCallback, useMemo } from 'react'
+import { type FC, useState, useEffect, useCallback } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { FiHome, FiClipboard, FiSettings, FiLogOut, FiMenu, FiX, FiBox, FiEdit3 } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { getSessionUser, type AppRole } from '@/utils/session'
 import * as S from './styles'
-
-type AppRole = 'Administrador' | 'Operador'
-
-interface SessionUser {
-  role: AppRole | string
-}
 
 export const AppLayout: FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
   const navigate = useNavigate()
   const location = useLocation()
 
-  const user: SessionUser | null = useMemo(() => {
-    const raw = localStorage.getItem('user')
-    if (!raw) return null
-    try {
-      return JSON.parse(raw) as SessionUser
-    } catch {
-      return null
-    }
-  }, [])
-
+  const user = getSessionUser()
   const role = (user?.role || 'Operador') as AppRole
 
   useEffect(() => {
@@ -46,11 +32,19 @@ export const AppLayout: FC = () => {
     navigate('/login', { replace: true })
   }, [navigate])
 
-  const menuItems = useMemo(() => {
+  const menuItems = (() => {
     if (role === 'Operador') {
       return [
         { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
         { icon: FiEdit3, label: 'Registrar OS', path: '/register' },
+      ]
+    }
+
+    if (role === 'Supervisor') {
+      return [
+        { icon: FiHome, label: 'Dashboard', path: '/dashboard' },
+        { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
+        { icon: FiBox, label: 'Estoque', path: '/stock' },
       ]
     }
 
@@ -61,7 +55,7 @@ export const AppLayout: FC = () => {
       { icon: FiBox, label: 'Estoque', path: '/stock' },
       { icon: FiSettings, label: 'Configurações', path: '/settings/locations' },
     ]
-  }, [role])
+  })()
 
   return (
     <S.Wrapper>
