@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../../../../services/supabase'
 import * as S from './styles'
 import { Button } from '../../../../../components/Button'
-import { User } from '../index'
+import type { User } from '../index'
 
 interface UserModalProps {
   user?: User

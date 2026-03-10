@@ -3,12 +3,14 @@ export const designSystem = {
     primary: '#1e40af',
     primaryHover: '#1e3a8a',
     primaryLight: '#3b82f6',
-    primaryPale: '#eff6ff', // Adicionado para o background do item ativo
-    background: '#F8FAFC',
+    primaryPale: '#eff6ff',
+    background: '#f8fafc',
     surface: '#ffffff',
-    surfaceHover: '#f1f5f9', // Adicionado para o hover de botões/itens
+    surfaceHover: '#f1f5f9',
     textMain: '#020617',
-    textSecondary: '#64748b', // Adicionado
+    textPrimary: '#020617',
+    textSecondary: '#64748b',
+    white: '#ffffff',
     border: '#e5e7eb',
     error: '#ef4444',
   },
@@ -23,11 +25,27 @@ export const designSystem = {
     md: '10px',
     lg: '12px',
   },
+  typography: {
+    fontFamily: "'Inter', 'Segoe UI', sans-serif",
+    size: {
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      xxl: '1.5rem',
+      xxxl: '2rem',
+    },
+    weight: {
+      medium: 500,
+      semibold: 600,
+      bold: 700,
+    },
+  },
   transitions: {
     fast: '150ms ease',
     base: '300ms ease',
   },
   zIndex: {
     sticky: 100,
-  }
-};
+  },
+}
