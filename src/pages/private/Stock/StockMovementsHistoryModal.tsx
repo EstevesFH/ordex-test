@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FiClock, FiUser, FiX } from 'react-icons/fi'
 import { Modal } from '../../../components/Modal'
 import { useStockItems } from '../../../hooks/useStockItems'
+import { supabase } from '../../../services/supabase'
 import type { StockItem, StockMovement } from '../../../types'
 import * as S from './StockMovementsHistoryModal.styles'
 
@@ -22,6 +23,7 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
+  const [userNamesById, setUserNamesById] = useState<Record<number, string>>({})
 
   useEffect(() => {
     const loadMovements = async () => {
@@ -39,18 +41,50 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
       const loadedMovements = result.data || []
       setMovements(loadedMovements)
 
+      const ids = Array.from(
+        new Set(
+          loadedMovements
+            .map(m => m.performed_by)
+            .filter((value): value is number => typeof value === 'number')
+        )
+      )
+
+      if (ids.length > 0) {
+        const { data } = await supabase
+          .from('users')
+          .select('id, name, username')
+          .in('id', ids)
+
+        if (data) {
+          const names = data.reduce<Record<number, string>>((acc, user) => {
+            acc[user.id as number] = (user.name as string) || (user.username as string) || `Usuário #${user.id}`
+            return acc
+          }, {})
+
+          setUserNamesById(names)
+        }
+      }
+
       setLoading(false)
     }
 
     loadMovements()
   }, [fetchMovements, item.id])
 
-  const rows = movements.map(movement => ({
-    ...movement,
-    typeLabel: movementTypeLabel[movement.movement_type],
-    userLabel: movement.performed_by || 'Sistema',
-    dateLabel: new Date(movement.created_at).toLocaleString('pt-BR'),
-  }))
+  const rows = useMemo(() => {
+    return movements.map(movement => {
+      const userLabel = movement.performed_by
+        ? userNamesById[movement.performed_by] || `Usuário #${movement.performed_by}`
+        : 'Sistema'
+
+      return {
+        ...movement,
+        typeLabel: movementTypeLabel[movement.movement_type],
+        userLabel,
+        dateLabel: new Date(movement.created_at).toLocaleString('pt-BR'),
+      }
+    })
+  }, [movements, userNamesById])
 
   return (
     <Modal onClose={onClose} maxWidth="760px">

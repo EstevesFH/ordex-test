@@ -14,16 +14,16 @@ interface StockMovementModalProps {
 }
 
 interface SessionUser {
-  username?: string
+  id?: number
 }
 
-const getSessionUsername = (): string | undefined => {
+const getSessionUserId = (): number | undefined => {
   const raw = localStorage.getItem('user')
   if (!raw) return undefined
 
   try {
     const parsed = JSON.parse(raw) as SessionUser
-    return parsed.username || undefined
+    return typeof parsed.id === 'number' ? parsed.id : undefined
   } catch {
     return undefined
   }
@@ -69,7 +69,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
         newQuantity,
         reason || undefined,
         undefined,
-        getSessionUsername()
+        getSessionUserId()
       )
 
       if (result.success) {

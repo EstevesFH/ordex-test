@@ -14,6 +14,12 @@ const ResetPassword: React.FC = () => {
   const [error, setError] = useState('')
   const [validToken, setValidToken] = useState<boolean | null>(null)
 
+  const hasMinLength = password.length >= 8
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecial = /[^A-Za-z0-9]/.test(password)
+  const isStrongPassword = hasMinLength && hasUppercase && hasNumber && hasSpecial
+
   useEffect(() => {
     // Verificar se há um token de recuperação na URL
     checkRecoveryToken()
@@ -35,8 +41,8 @@ const ResetPassword: React.FC = () => {
     setError('')
 
     // Validações
-    if (password.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres')
+    if (!isStrongPassword) {
+      setError('A senha deve ter no mínimo 8 caracteres, 1 maiúscula, 1 número e 1 caractere especial')
       return
     }
 
@@ -144,7 +150,7 @@ const ResetPassword: React.FC = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              placeholder="Mínimo 6 caracteres"
+placeholder="Mínimo 8 caracteres"
               autoFocus
             />
           </S.Field>
@@ -164,8 +170,17 @@ const ResetPassword: React.FC = () => {
 
           <S.PasswordRules>
             <p><strong>Requisitos da senha:</strong></p>
-            <S.RuleItem valid={password.length >= 6}>
-              {password.length >= 6 ? '✓' : '○'} Mínimo de 6 caracteres
+            <S.RuleItem valid={hasMinLength}>
+              {hasMinLength ? '✓' : '○'} Mínimo de 8 caracteres
+            </S.RuleItem>
+            <S.RuleItem valid={hasUppercase}>
+              {hasUppercase ? '✓' : '○'} Pelo menos 1 letra maiúscula
+            </S.RuleItem>
+            <S.RuleItem valid={hasNumber}>
+              {hasNumber ? '✓' : '○'} Pelo menos 1 número
+            </S.RuleItem>
+            <S.RuleItem valid={hasSpecial}>
+              {hasSpecial ? '✓' : '○'} Pelo menos 1 caractere especial
             </S.RuleItem>
             <S.RuleItem valid={password === confirmPassword && password.length > 0}>
               {password === confirmPassword && password.length > 0 ? '✓' : '○'} Senhas coincidem
