@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { FiMail, FiLock } from 'react-icons/fi'
 import { supabase } from '../../../services/supabase'
-import Iridescence from '../../../components/ReactBits/Iridescence'
 import Button from '../../../components/Button'
 import * as S from './styles'
+
+type AppRole = 'Administrador' | 'Operador'
 
 const Login = () => {
   const [login, setLogin] = useState('')
@@ -23,7 +24,7 @@ const Login = () => {
     const fifteenMinutes = 15 * 60 * 1000
 
     if (now - (user.lastActive || now) < fifteenMinutes) {
-      navigate('/dashboard')
+      navigate(user.role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
     }
   }, [navigate])
 
@@ -46,15 +47,20 @@ const Login = () => {
         return
       }
 
-      localStorage.setItem('user', JSON.stringify({
-        id: data.id,
-        username: data.username,
-        name: data.name,
-        role: data.role,
-        lastActive: Date.now()
-      }))
+      const role = ((data.role as string) || 'Operador') as AppRole
 
-      navigate('/dashboard')
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: data.id,
+          username: data.username,
+          name: data.name,
+          role,
+          lastActive: Date.now(),
+        }),
+      )
+
+      navigate(role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
     } catch (err) {
       console.error(err)
       setError('Erro ao autenticar. Tente novamente.')
@@ -65,13 +71,6 @@ const Login = () => {
 
   return (
     <S.Container>
-      <Iridescence 
-        color={[0.12, 0.24, 0.45]}
-        speed={0.3}                
-        amplitude={0.15}           
-        mouseReact={false}
-      />
-
       <S.LoginCard>
         <S.LogoWrapper>
           <div className="icon-box">
@@ -89,7 +88,7 @@ const Login = () => {
               <input
                 type="text"
                 value={login}
-                onChange={(e) => setLogin(e.target.value)}
+                onChange={e => setLogin(e.target.value)}
                 placeholder="nome.usuario"
                 required
               />
@@ -103,7 +102,7 @@ const Login = () => {
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
               />
@@ -117,19 +116,8 @@ const Login = () => {
           </S.ForgotLink>
 
           <S.ActionWrapper>
-            <Button 
-              primary 
-              type="submit" 
-              disabled={loading}
-            >
+            <Button primary type="submit" disabled={loading}>
               {loading ? 'Autenticando...' : 'Entrar'}
-            </Button>
-            
-            <Button 
-              type="button" 
-              onClick={() => navigate('/')}
-            >
-              Voltar
             </Button>
           </S.ActionWrapper>
         </form>

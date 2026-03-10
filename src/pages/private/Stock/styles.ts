@@ -1,123 +1,98 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
 
 export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: ${ds.spacing.lg};
+  gap: ${ds.spacing.md};
+  flex-wrap: wrap;
 
   h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #f1f5f9;
-    letter-spacing: -0.5px;
-    
-    background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: ${ds.typography.size.xxl};
+    font-weight: ${ds.typography.weight.bold};
+    color: ${ds.colors.textMain};
+    margin: 0;
   }
 `
 
 export const Alert = styled.div`
-  background: rgba(245, 158, 11, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
   border-left: 4px solid #f59e0b;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 24px;
+  padding: ${ds.spacing.md};
+  border-radius: ${ds.radius.md};
+  margin-bottom: ${ds.spacing.md};
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  gap: ${ds.spacing.md};
 
   strong {
-    color: #fbbf24;
-    font-size: 16px;
+    color: #92400e;
     display: block;
   }
 
   p {
-    margin: 4px 0 0 0;
-    color: #fcd34d;
-    font-size: 14px;
+    margin: 4px 0 0;
+    color: #b45309;
+    font-size: ${ds.typography.size.sm};
   }
 `
 
 export const AlertIcon = styled.div`
-  color: #f59e0b;
+  color: #d97706;
   display: flex;
-  align-items: center;
-  justify-content: center;
 `
 
 export const Controls = styled.div`
   display: flex;
-  gap: 12px;
+  gap: ${ds.spacing.sm};
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: ${ds.spacing.md};
 `
 
 export const LowStockBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
   padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: ${ds.radius.md};
+  font-size: ${ds.typography.size.sm};
+  font-weight: ${ds.typography.weight.semibold};
 `
 
 export const TableCard = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  padding: ${ds.spacing.lg};
+  border-radius: ${ds.radius.lg};
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
 `
 
 export const TableHeader = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: ${ds.spacing.md};
 
   h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #f1f5f9;
+    margin: 0;
+    font-size: ${ds.typography.size.lg};
+    color: ${ds.colors.textMain};
   }
 `
 
 export const EmptyMessage = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-  font-size: 16px;
+  padding: ${ds.spacing.xl} ${ds.spacing.md};
+  color: ${ds.colors.textSecondary};
 `
 
 export const TableWrapper = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  max-height: 520px;
+  overflow: auto;
 
   table {
     width: 100%;
@@ -126,80 +101,57 @@ export const TableWrapper = styled.div`
 
   th {
     text-align: left;
-    font-size: 13px;
-    color: #ffffff;
-    font-weight: 600;
-    padding-bottom: 12px;
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.textSecondary};
+    font-weight: ${ds.typography.weight.semibold};
+    padding: 10px 8px;
     position: sticky;
     top: 0;
-    //background: rgba(15, 23, 42, 0.9);
-    //backdrop-filter: blur(12px);
-    z-index: 1;
+    background: ${ds.colors.surface};
   }
 
   td {
-    font-size: 14px;
-    color: #cbd5e1;
-    padding: 16px 8px;
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
-
-    strong {
-      color: #f1f5f9;
-      font-weight: 600;
-    }
-  }
-
-  tbody tr {
-    transition: background 0.3s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.textMain};
+    padding: 12px 8px;
+    border-top: 1px solid ${ds.colors.border};
   }
 `
 
-interface QuantityCellProps {
-  critical: boolean
-}
-
-export const QuantityCell = styled.div<QuantityCellProps>`
+export const QuantityCell = styled.div<{ critical: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: ${props => (props.critical ? 700 : 500)};
-  color: ${props => (props.critical ? '#fca5a5' : '#cbd5e1')};
+  font-weight: ${({ critical }) => (critical ? 700 : 500)};
+  color: ${({ critical }) => (critical ? '#b91c1c' : ds.colors.textMain)};
 
   svg {
-    color: #fbbf24;
+    color: #d97706;
   }
 `
-
-interface StatusBadgeProps {
-  status: string
-}
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Disponível':
-      return { bg: 'rgba(16, 185, 129, 0.1)', color: '#6ee7b7', border: 'rgba(16, 185, 129, 0.3)' }
+      return { bg: '#ecfdf5', color: '#047857', border: '#a7f3d0' }
     case 'Reservado':
-      return { bg: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' }
+      return { bg: '#fffbeb', color: '#b45309', border: '#fde68a' }
     case 'Indisponível':
-      return { bg: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' }
+      return { bg: '#fef2f2', color: '#b91c1c', border: '#fecaca' }
     default:
-      return { bg: 'rgba(148, 163, 184, 0.1)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' }
+      return { bg: '#f8fafc', color: '#64748b', border: '#e2e8f0' }
   }
 }
 
-export const StatusBadge = styled.span<StatusBadgeProps>`
+export const StatusBadge = styled.span<{ status: string }>`
   display: inline-block;
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
-  background: ${props => getStatusColor(props.status).bg};
-  color: ${props => getStatusColor(props.status).color};
-  border: 1px solid ${props => getStatusColor(props.status).border};
+  font-weight: ${ds.typography.weight.semibold};
+  background: ${({ status }) => getStatusColor(status).bg};
+  color: ${({ status }) => getStatusColor(status).color};
+  border: 1px solid ${({ status }) => getStatusColor(status).border};
 `
 
 export const Actions = styled.div`
@@ -208,19 +160,18 @@ export const Actions = styled.div`
 `
 
 export const ActionButton = styled.button`
-  background: transparent;
-  border: none;
-  color: #94a3b8;
+  border: 1px solid ${ds.colors.border};
+  background: ${ds.colors.surface};
+  color: ${ds.colors.textSecondary};
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: ${ds.radius.md};
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #60a5fa;
+    color: ${ds.colors.primary};
+    border-color: ${ds.colors.primaryLight};
   }
 `

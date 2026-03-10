@@ -4,7 +4,8 @@ import { useAssets } from '../../../hooks/useAssets'
 import { useToast } from '../../../hooks/useToast'
 import type { Asset } from '../../../types'
 import { Button } from '../../../components/Button'
-import { Filter, FilterField } from '../../../components/Filter'
+import { Filter } from '../../../components/Filter'
+import type { FilterField } from '../../../components/Filter'
 import { Pagination } from '../../../components/Pagination'
 import { SkeletonTable } from '../../../components/Skeleton'
 import AssetModal from './AssetModal'
@@ -127,13 +128,14 @@ const Assets: React.FC = () => {
       </S.Header>
 
       <S.Controls>
-        <Button variant="secondary" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-          Filtros {(search || filterCategory || filterStatus) && '(Ativos)'}
-        </Button>
+        <Button
+          title={`Filtrar ${(search || filterCategory || filterStatus) ? '(Ativos)' : ''}`.trim()}
+          variant="secondary"
+          size="small"
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        />
         {(search || filterCategory || filterStatus) && (
-          <Button variant="secondary" onClick={clearFilters}>
-            Limpar Filtros
-          </Button>
+          <Button title="Limpar filtros" variant="secondary" size="small" onClick={clearFilters} />
         )}
       </S.Controls>
 

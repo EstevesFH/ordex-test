@@ -5,7 +5,8 @@ import * as S from './styles'
 import { Loader } from '../../../../components/Loader'
 import { Pagination } from '../../../../components/Pagination'
 import { Button } from '../../../../components/Button'
-import { Filter, FilterField } from '../../../../components/Filter'
+import { Filter } from '../../../../components/Filter'
+import type { FilterField } from '../../../../components/Filter'
 import { AccessesModal } from './AccessesModal'
 
 export interface Accesses {
@@ -95,6 +96,7 @@ const AccessesSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterRole('')
@@ -103,7 +105,7 @@ const AccessesSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
           <Button title="Novo Acesso" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>

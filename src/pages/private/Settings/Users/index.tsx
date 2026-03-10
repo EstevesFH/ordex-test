@@ -6,7 +6,8 @@ import { Loader } from '../../../../components/Loader'
 import { Pagination } from '../../../../components/Pagination'
 import { UserModal } from './UserModal'
 import { Button } from '../../../../components/Button'
-import { Filter, FilterField } from '../../../../components/Filter'
+import { Filter } from '../../../../components/Filter'
+import type { FilterField } from '../../../../components/Filter'
 
 export interface User {
   id: number
@@ -71,6 +72,7 @@ const UsersSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterStatus('')
