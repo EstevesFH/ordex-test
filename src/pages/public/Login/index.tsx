@@ -7,14 +7,6 @@ import * as S from './styles'
 
 type AppRole = 'Administrador' | 'Operador'
 
-interface AccessRecord {
-  id: number
-  name: string
-  email: string
-  role: AppRole | string
-  status: 'Ativo' | 'Inativo'
-}
-
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -42,38 +34,35 @@ const Login = () => {
     setError('')
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (authError) {
+      if (authError || !signInData.user) {
         setError('E-mail ou senha inválidos.')
         return
       }
 
-      const { data, error: accessError } = await supabase
-        .from('accesses')
-        .select('*')
-        .eq('email', email)
-        .ilike('status', 'ativo')
-        .single()
+      const role = ((signInData.user.app_metadata?.role as string) || 'Operador') as AppRole
+      const status = ((signInData.user.app_metadata?.status as string) || 'Ativo').toLowerCase()
+      const displayName =
+        (signInData.user.user_metadata?.name as string) ||
+        (signInData.user.email?.split('@')[0] as string) ||
+        'Usuário'
 
-      if (accessError || !data) {
+      if (status !== 'ativo') {
         await supabase.auth.signOut()
-        setError('Acesso não encontrado ou inativo.')
+        setError('Usuário inativo. Contate o administrador.')
         return
       }
-
-      const access = data as AccessRecord
-      const role = ((access.role as string) || 'Operador') as AppRole
 
       localStorage.setItem(
         'user',
         JSON.stringify({
-          id: access.id,
-          username: access.email,
-          name: access.name,
+          id: signInData.user.id,
+          username: signInData.user.email,
+          name: displayName,
           role,
           lastActive: Date.now(),
         }),

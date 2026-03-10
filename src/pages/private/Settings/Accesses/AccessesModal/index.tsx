@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../../../services/supabase'
-import * as S from './styles'
 import { Button } from '../../../../../components/Button'
+import { authUsersService } from '../../../../../services/authUsers'
 import type { Accesses } from '../index'
+import * as S from './styles'
 
 interface AccessesModalProps {
   accesses?: Accesses
@@ -15,7 +15,7 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
   const isEdit = mode === 'edit'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState('')
+  const [role, setRole] = useState('Operador')
   const [status, setStatus] = useState<'Ativo' | 'Inativo'>('Ativo')
   const [saving, setSaving] = useState(false)
 
@@ -36,52 +36,35 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
 
     setSaving(true)
 
-    if (mode === 'create') {
-      const { error } = await supabase.from('accesses').insert({
-        name,
-        email,
-        role,
-        status: 'Ativo',
-      })
-
-      if (error) {
-        alert('Erro ao criar acesso')
-        setSaving(false)
-        return
+    try {
+      if (mode === 'create') {
+        await authUsersService.create({ name, email, role })
+        alert(`Usuário criado no Auth e e-mail enviado para definir senha: ${email}`)
       }
 
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-
-      if (resetError) {
-        alert('Acesso criado, mas falhou ao enviar e-mail de criação de senha.')
-      } else {
-        alert(`Acesso criado e e-mail enviado para ${email} criar a senha.`)
+      if (mode === 'edit' && accesses) {
+        await authUsersService.update({
+          id: accesses.id,
+          name,
+          email,
+          role,
+          status,
+        })
       }
+
+      onUpdated()
+    } catch (error) {
+      console.error(error)
+      alert('Erro ao salvar usuário no Auth')
+    } finally {
+      setSaving(false)
     }
-
-    if (mode === 'edit' && accesses) {
-      const { error } = await supabase
-        .from('accesses')
-        .update({ name, email, role, status })
-        .eq('id', accesses.id)
-
-      if (error) {
-        alert('Erro ao atualizar acesso')
-        setSaving(false)
-        return
-      }
-    }
-
-    setSaving(false)
-    onUpdated()
   }
 
   return (
     <S.Overlay onClick={onClose}>
       <S.Modal onClick={e => e.stopPropagation()}>
-        <S.Title>{isEdit ? 'Editar Acesso' : 'Novo Acesso'}</S.Title>
+        <S.Title>{isEdit ? 'Editar Acesso (Auth)' : 'Novo Acesso (Auth)'}</S.Title>
 
         <S.Field>
           <label>Nome</label>
@@ -95,7 +78,10 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
 
         <S.Field>
           <label>Função</label>
-          <input value={role} onChange={e => setRole(e.target.value)} />
+          <select value={role} onChange={e => setRole(e.target.value)}>
+            <option value="Administrador">Administrador</option>
+            <option value="Operador">Operador</option>
+          </select>
         </S.Field>
 
         {isEdit && (
