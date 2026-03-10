@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { FiUsers, FiMapPin, FiBox, FiLock } from 'react-icons/fi'
+import { FiMapPin, FiBox, FiLock } from 'react-icons/fi'
 import * as S from './styles'
 
 export const SettingsSidebar = () => {
@@ -27,14 +27,6 @@ export const SettingsSidebar = () => {
         >
           <FiMapPin />
           <S.Label>Locais</S.Label>
-        </S.NavItem>
-
-        <S.NavItem
-          active={location.pathname.includes('/settings/users')}
-          onClick={() => navigate('users')}
-        >
-          <FiUsers />
-          <S.Label>Usuários</S.Label>
         </S.NavItem>
 
         <S.NavItem

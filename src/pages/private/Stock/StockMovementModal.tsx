@@ -13,6 +13,22 @@ interface StockMovementModalProps {
   onSuccess: () => void
 }
 
+interface SessionUser {
+  username?: string
+}
+
+const getSessionUsername = (): string | undefined => {
+  const raw = localStorage.getItem('user')
+  if (!raw) return undefined
+
+  try {
+    const parsed = JSON.parse(raw) as SessionUser
+    return parsed.username || undefined
+  } catch {
+    return undefined
+  }
+}
+
 const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, onSuccess }) => {
   const { updateQuantity } = useStockItems()
   const { addToast } = useToast()
@@ -48,7 +64,13 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({ item, onClose, 
         newQuantity = quantity
       }
 
-      const result = await updateQuantity(item.id, newQuantity, reason || undefined)
+      const result = await updateQuantity(
+        item.id,
+        newQuantity,
+        reason || undefined,
+        undefined,
+        getSessionUsername()
+      )
 
       if (result.success) {
         addToast('success', 'Movimentação registrada com sucesso!')
