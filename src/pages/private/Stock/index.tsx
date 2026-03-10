@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FiPlus, FiEdit, FiAlertCircle, FiTrendingUp, FiTrendingDown, FiEye } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiAlertCircle, FiTrendingUp, FiClock } from 'react-icons/fi'
 import { useStockItems } from '../../../hooks/useStockItems'
 import { useToast } from '../../../hooks/useToast'
 import type { StockItem } from '../../../types'
@@ -10,6 +10,7 @@ import { Pagination } from '../../../components/Pagination'
 import { SkeletonTable } from '../../../components/Skeleton'
 import StockItemModal from './StockItemModal'
 import StockMovementModal from './StockMovementModal'
+import StockMovementsHistoryModal from './StockMovementsHistoryModal'
 import * as S from './styles'
 
 const Stock: React.FC = () => {
@@ -25,7 +26,7 @@ const Stock: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const [selectedItem, setSelectedItem] = useState<StockItem | null>(null)
-  const [mode, setMode] = useState<'view' | 'edit' | 'create' | 'movement'>('view')
+  const [mode, setMode] = useState<'view' | 'edit' | 'create' | 'movement' | 'history'>('view')
 
   useEffect(() => {
     fetchStockItems()
@@ -64,6 +65,11 @@ const Stock: React.FC = () => {
   const openMovement = (item: StockItem) => {
     setSelectedItem(item)
     setMode('movement')
+  }
+
+  const openHistory = (item: StockItem) => {
+    setSelectedItem(item)
+    setMode('history')
   }
 
   const closeModal = () => {
@@ -222,6 +228,9 @@ const Stock: React.FC = () => {
                             <S.ActionButton onClick={() => openMovement(item)} title="Movimentar">
                               <FiTrendingUp size={16} />
                             </S.ActionButton>
+                            <S.ActionButton onClick={() => openHistory(item)} title="Ver movimentações">
+                              <FiClock size={16} />
+                            </S.ActionButton>
                             <S.ActionButton onClick={() => openEdit(item)} title="Editar">
                               <FiEdit size={16} />
                             </S.ActionButton>
@@ -261,6 +270,13 @@ const Stock: React.FC = () => {
           item={selectedItem}
           onClose={closeModal}
           onSuccess={handleSuccess}
+        />
+      )}
+
+      {mode === 'history' && selectedItem && (
+        <StockMovementsHistoryModal
+          item={selectedItem}
+          onClose={closeModal}
         />
       )}
     </>
