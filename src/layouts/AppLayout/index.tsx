@@ -1,6 +1,7 @@
 import { FC, useState, useEffect, useCallback, useMemo } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { FiHome, FiClipboard, FiSettings, FiLogOut, FiMenu, FiX, FiBox, FiEdit3 } from 'react-icons/fi'
+import { supabase } from '@/services/supabase'
 import * as S from './styles'
 
 type AppRole = 'Administrador' | 'Operador'
@@ -39,9 +40,13 @@ export const AppLayout: FC = () => {
     })
   }, [])
 
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem('user')
-    navigate('/login', { replace: true })
+  const handleLogout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      localStorage.removeItem('user')
+      navigate('/login', { replace: true })
+    }
   }, [navigate])
 
   const menuItems = useMemo(() => {
@@ -91,7 +96,7 @@ export const AppLayout: FC = () => {
         </S.Nav>
 
         <S.Footer>
-          <S.LogoutButton $isOpen={sidebarOpen} onClick={handleLogout}>
+          <S.LogoutButton $isOpen={sidebarOpen} onClick={() => void handleLogout()}>
             <FiLogOut size={20} />
             {sidebarOpen && <span>Sair</span>}
           </S.LogoutButton>
