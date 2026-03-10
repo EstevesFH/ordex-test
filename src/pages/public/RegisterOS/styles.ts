@@ -2,25 +2,21 @@ import styled from 'styled-components'
 import { designSystem as ds } from '../../../styles/designSystem'
 
 export const Container = styled.div`
-  min-height: 100vh;
   width: 100%;
-  background: ${ds.colors.background};
-  padding: ${ds.spacing.xl} ${ds.spacing.md};
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: ${ds.spacing.md};
 `
 
 export const Header = styled.header`
-  position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 900px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${ds.spacing.lg};
   gap: ${ds.spacing.md};
+  flex-wrap: wrap;
 `
 
 export const TitleSection = styled.div`
@@ -36,13 +32,10 @@ export const TitleSection = styled.div`
 `
 
 export const FormCard = styled.div`
-  position: relative;
-  z-index: 1;
   background: ${ds.colors.surface};
   border-radius: ${ds.radius.lg};
   padding: ${ds.spacing.lg};
   width: 100%;
-  max-width: 900px;
   border: 1px solid ${ds.colors.border};
   box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
 
@@ -75,6 +68,7 @@ export const FormGroup = styled.div`
     color: ${ds.colors.textSecondary};
   }
 
+  input,
   select,
   textarea {
     width: 100%;

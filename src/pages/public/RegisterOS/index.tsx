@@ -1,33 +1,47 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../../services/supabase'
 import Button from '../../../components/Button'
-import type { User, Location, Product } from '../../../types'
+import type { Location, Product } from '../../../types'
 import * as S from './styles'
+import { FiCheckCircle } from 'react-icons/fi'
+
+interface SessionUser {
+  username?: string
+  name?: string
+}
 
 const RegisterOS = () => {
-  const [users, setUsers] = useState<User[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [protocol, setProtocol] = useState<number | null>(null)
 
   const [form, setForm] = useState({
-    solicitanteId: '',
     localId: '',
     produtoId: '',
     prioridade: '',
     descricao: '',
   })
 
-  const navigate = useNavigate()
-  const isLoggedIn = localStorage.getItem('user') !== null
+  const sessionUser = useMemo<SessionUser | null>(() => {
+    const raw = localStorage.getItem('user')
+    if (!raw) return null
+    try {
+      return JSON.parse(raw) as SessionUser
+    } catch {
+      return null
+    }
+  }, [])
+
+  const loggedSolicitante = useMemo(
+    () => sessionUser?.name || sessionUser?.username || 'Usuário Logado',
+    [sessionUser],
+  )
 
   const fetchTable = async <T,>(
-    table: string, 
-    setState: (data: T[]) => void, 
-    selectColumns: string
+    table: string,
+    setState: (data: T[]) => void,
+    selectColumns: string,
   ) => {
     try {
       const { data, error } = await supabase
@@ -49,7 +63,6 @@ const RegisterOS = () => {
   }
 
   useEffect(() => {
-    fetchTable<User>('users', setUsers, 'id, userName, status')
     fetchTable<Location>('locations', setLocations, 'id, locationName, status')
     fetchTableProducts()
   }, [])
@@ -82,17 +95,16 @@ const RegisterOS = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const solicitanteNome = users.find(u => u.id === Number(form.solicitanteId))?.userName
     const localNome = locations.find(l => l.id === Number(form.localId))?.locationName
     const produtoNome = products.find(p => p.id === Number(form.produtoId))?.productName
 
-    if (!solicitanteNome || !localNome || !produtoNome) {
+    if (!localNome || !produtoNome) {
       alert('Erro ao processar os dados: Verifique se todos os campos foram selecionados corretamente.')
       return
     }
 
     const payload = {
-      solicitante: solicitanteNome,
+      solicitante: loggedSolicitante,
       local: localNome,
       produto: produtoNome,
       prioridade: form.prioridade,
@@ -102,10 +114,7 @@ const RegisterOS = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('tickets')
-        .insert([payload])
-        .select()
+      const { data, error } = await supabase.from('tickets').insert([payload]).select()
 
       if (error) throw error
 
@@ -113,7 +122,6 @@ const RegisterOS = () => {
         setProtocol(data[0].id)
         setShowSuccessModal(true)
         setForm({
-          solicitanteId: '',
           localId: '',
           produtoId: '',
           prioridade: '',
@@ -130,17 +138,8 @@ const RegisterOS = () => {
     <S.Container>
       <S.Header>
         <S.TitleSection>
-          <Button onClick={() => navigate(-1)}>
-            <FiArrowLeft size={22} />
-          </Button>
           <h1>Nova Ordem de Serviço</h1>
         </S.TitleSection>
-
-        {!isLoggedIn && (
-          <Button onClick={() => navigate('/view-tickets')}>
-            Consultar OS
-          </Button>
-        )}
       </S.Header>
 
       <S.FormCard>
@@ -149,17 +148,18 @@ const RegisterOS = () => {
           <S.FormGrid>
             <S.FormGroup>
               <label>Solicitante</label>
-              <select name="solicitanteId" value={form.solicitanteId} onChange={handleChange} required>
-                <option value="">Selecione o funcionário</option>
-                {users.map(user => <option key={user.id} value={user.id}>{user.userName}</option>)}
-              </select>
+              <input value={loggedSolicitante} disabled />
             </S.FormGroup>
 
             <S.FormGroup>
               <label>Local / Setor</label>
               <select name="localId" value={form.localId} onChange={handleChange} required>
                 <option value="">Selecione o local</option>
-                {locations.map(loc => <option key={loc.id} value={loc.id}>{loc.locationName}</option>)}
+                {locations.map(loc => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.locationName}
+                  </option>
+                ))}
               </select>
             </S.FormGroup>
 
@@ -176,7 +176,11 @@ const RegisterOS = () => {
               <label>Equipamento / Produto</label>
               <select name="produtoId" value={form.produtoId} onChange={handleChange} required>
                 <option value="">Selecione o item</option>
-                {products.map(prod => <option key={prod.id} value={prod.id}>{prod.productName}</option>)}
+                {products.map(prod => (
+                  <option key={prod.id} value={prod.id}>
+                    {prod.productName}
+                  </option>
+                ))}
               </select>
             </S.FormGroup>
           </S.FormGrid>

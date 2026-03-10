@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Pagination } from '../../../components/Pagination'
 import { supabase } from '../../../services/supabase'
 import {
   Alert,
@@ -25,6 +26,8 @@ interface Ticket {
 const Dashboard = () => {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -68,6 +71,16 @@ const Dashboard = () => {
         .sort((a, b) => b.id - a.id),
     [tickets],
   )
+
+  const paginatedTickets = useMemo(
+    () => visibleTickets.slice((page - 1) * itemsPerPage, page * itemsPerPage),
+    [visibleTickets, page, itemsPerPage],
+  )
+
+  const handleItemsPerPageChange = (count: number) => {
+    setItemsPerPage(count)
+    setPage(1)
+  }
 
   if (loading) {
     return <Container>Carregando dashboard...</Container>
@@ -120,7 +133,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {visibleTickets.map(ticket => (
+              {paginatedTickets.map(ticket => (
                 <tr key={ticket.id}>
                   <td>{ticket.id}</td>
                   <td>{ticket.solicitante}</td>
@@ -135,6 +148,16 @@ const Dashboard = () => {
             </tbody>
           </table>
         </TableWrapper>
+
+        {visibleTickets.length > 0 && (
+          <Pagination
+            totalItems={visibleTickets.length}
+            currentPage={page}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        )}
       </TableCard>
     </Container>
   )
