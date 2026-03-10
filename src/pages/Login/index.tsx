@@ -27,7 +27,7 @@ const Login = () => {
     }
   }, [navigate])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -96,10 +96,11 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <S.InputGroup>
-            <label>E-mail</label>
+            <label htmlFor="login-email">E-mail</label>
             <div className="input-wrapper">
               <FiMail size={18} />
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -110,10 +111,11 @@ const Login = () => {
           </S.InputGroup>
 
           <S.InputGroup>
-            <label>Senha</label>
+            <label htmlFor="login-password">Senha</label>
             <div className="input-wrapper">
               <FiLock size={18} />
               <input
+                id="login-password"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
