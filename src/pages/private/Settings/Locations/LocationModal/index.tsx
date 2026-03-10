@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../../../../services/supabase'
 import { Button } from '../../../../../components/Button'
-import { Location } from '../index'
+import type { Location } from '../index'
 import * as S from './styles'
 
 interface Props {
