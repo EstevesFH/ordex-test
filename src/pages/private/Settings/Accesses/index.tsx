@@ -96,6 +96,7 @@ const AccessesSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterRole('')
@@ -104,7 +105,7 @@ const AccessesSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
           <Button title="Novo Acesso" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>

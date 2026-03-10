@@ -128,13 +128,14 @@ const Assets: React.FC = () => {
       </S.Header>
 
       <S.Controls>
-        <Button variant="secondary" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-          Filtros {(search || filterCategory || filterStatus) && '(Ativos)'}
-        </Button>
+        <Button
+          title={`Filtrar ${(search || filterCategory || filterStatus) ? '(Ativos)' : ''}`.trim()}
+          variant="secondary"
+          size="small"
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        />
         {(search || filterCategory || filterStatus) && (
-          <Button variant="secondary" onClick={clearFilters}>
-            Limpar Filtros
-          </Button>
+          <Button title="Limpar filtros" variant="secondary" size="small" onClick={clearFilters} />
         )}
       </S.Controls>
 

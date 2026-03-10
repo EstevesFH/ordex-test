@@ -128,12 +128,14 @@ const Tickets = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={clearFilters}
             />
           )}
           <Button 
             title="Filtrar" 
             variant="secondary" 
+            size="small"
             onClick={() => setIsFilterOpen(true)} 
           />
         </S.Controls>

@@ -57,7 +57,7 @@ export const AppLayout: FC = () => {
       { icon: FiClipboard, label: 'Tickets', path: '/tickets' },
       { icon: FiEdit3, label: 'Registrar OS', path: '/register' },
       { icon: FiBox, label: 'Estoque', path: '/stock' },
-      { icon: FiSettings, label: 'Configurações', path: '/settings/users' },
+      { icon: FiSettings, label: 'Configurações', path: '/settings/locations' },
     ]
   }, [role])
 

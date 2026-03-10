@@ -72,6 +72,7 @@ const UsersSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterStatus('')

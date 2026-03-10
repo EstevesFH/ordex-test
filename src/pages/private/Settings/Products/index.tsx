@@ -69,6 +69,7 @@ const ProductsSettings = () => {
                 <Button
                 title="Limpar filtros"
                 variant="secondary"
+                size="small"
                 onClick={() => {
                     setSearch('')
                     setFilterType('')
@@ -77,7 +78,7 @@ const ProductsSettings = () => {
                 }}
                 />
             )}
-            <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+            <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
             <Button title="Novo Produto" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>

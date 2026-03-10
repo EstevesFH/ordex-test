@@ -76,6 +76,7 @@ const LocationsSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterStatus('')
@@ -83,7 +84,7 @@ const LocationsSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
           <Button title="Novo Local" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>

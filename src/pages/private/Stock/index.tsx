@@ -134,9 +134,12 @@ const Stock: React.FC = () => {
       )}
 
       <S.Controls>
-        <Button variant="secondary" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-          Filtros {(search || filterStatus || showLowStock) && '(Ativos)'}
-        </Button>
+        <Button
+          title={`Filtrar ${(search || filterStatus || showLowStock) ? '(Ativos)' : ''}`.trim()}
+          variant="secondary"
+          size="small"
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        />
         {showLowStock && (
           <S.LowStockBadge>
             <FiAlertCircle size={14} />
@@ -144,9 +147,7 @@ const Stock: React.FC = () => {
           </S.LowStockBadge>
         )}
         {(search || filterStatus || showLowStock) && (
-          <Button variant="secondary" onClick={clearFilters}>
-            Limpar Filtros
-          </Button>
+          <Button title="Limpar filtros" variant="secondary" size="small" onClick={clearFilters} />
         )}
       </S.Controls>
 

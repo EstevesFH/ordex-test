@@ -6,7 +6,6 @@ import { Settings } from './pages/private/Settings'
 import { AccessesSettings } from './pages/private/Settings/Accesses'
 import { LocationsSettings } from './pages/private/Settings/Locations'
 import { ProductsSettings } from './pages/private/Settings/Products'
-import { UsersSettings } from './pages/private/Settings/Users'
 import { Stock } from './pages/private/Stock'
 import { Tickets } from './pages/private/Tickets'
 import { ForgotPassword } from './pages/public/ForgotPassword'
@@ -152,8 +151,7 @@ const App: FC = () => (
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="users" replace />} />
-        <Route path="users" element={<UsersSettings />} />
+        <Route index element={<Navigate to="locations" replace />} />
         <Route path="locations" element={<LocationsSettings />} />
         <Route path="products" element={<ProductsSettings />} />
         <Route path="accesses" element={<AccessesSettings />} />
