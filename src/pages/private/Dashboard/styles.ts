@@ -1,205 +1,139 @@
 import styled from 'styled-components'
+import { designSystem } from '../../../styles/designSystem'
 
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 32px; 
+  gap: ${designSystem.spacing.xl};
 `
 
 export const Header = styled.div`
-  margin-bottom: 32px;
-
   h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #f1f5f9;
-    letter-spacing: -0.5px;
-    
-    background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin: 0;
+    font-size: 2rem;
+    color: ${designSystem.colors.textMain};
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: ${designSystem.colors.textSecondary};
   }
 `
 
 export const StatusGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: ${designSystem.spacing.md};
 
   @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
   }
 `
 
 export const StatusCard = styled.div`
-  /* Glassmorphism card */
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 
-      0 12px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border-color: rgba(59, 130, 246, 0.3);
-  }
+  background: ${designSystem.colors.surface};
+  border: 1px solid ${designSystem.colors.border};
+  border-radius: ${designSystem.radius.lg};
+  padding: ${designSystem.spacing.lg};
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.05);
 
   span {
-    font-size: 14px;
-    color: #94a3b8;
-    font-weight: 500;
+    font-size: 0.875rem;
+    color: ${designSystem.colors.textSecondary};
   }
 
   strong {
     display: block;
     margin-top: 8px;
-    font-size: 32px;
-    color: #f1f5f9;
+    font-size: 1.75rem;
+    color: ${designSystem.colors.textMain};
     font-weight: 700;
   }
 `
 
 export const Alert = styled.div`
-  background: rgba(239, 68, 68, 0.1);
-  backdrop-filter: blur(8px);
-  border-left: 4px solid #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-left: 4px solid #ef4444;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 32px;
-
-  strong {
-    color: #fca5a5;
-    font-weight: 600;
-  }
-
-  h3 {
-    margin-top: 4px;
-    color: #fecaca;
-  }
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: ${designSystem.radius.md};
+  padding: ${designSystem.spacing.md};
+  color: #9a3412;
 `
 
 export const TableCard = styled.div`
-  /* Glassmorphism card */
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: ${designSystem.colors.surface};
+  border: 1px solid ${designSystem.colors.border};
+  border-radius: ${designSystem.radius.lg};
+  padding: ${designSystem.spacing.lg};
 
   h2 {
-    font-size: 18px;
-    margin-bottom: 16px;
-    color: #f1f5f9;
-    font-weight: 600;
+    margin: 0 0 ${designSystem.spacing.md};
+    color: ${designSystem.colors.textMain};
+    font-size: 1.125rem;
   }
 `
 
 export const TableWrapper = styled.div`
-  max-height: 360px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    
-    &:hover {
-      background: rgba(148, 163, 184, 0.5);
-    }
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.2);
-  }
+  overflow-x: auto;
 
   table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  th {
+  th,
+  td {
     text-align: left;
-    font-size: 13px;
-    color: #ffffff;
-    font-weight: 600;
-    padding-bottom: 12px;
-    position: sticky;
-    top: 0;
-    //background: rgba(15, 23, 42, 0.9);
-    //backdrop-filter: blur(12px);
+    padding: 12px 8px;
+    border-bottom: 1px solid ${designSystem.colors.border};
+    font-size: 0.9rem;
+  }
 
-    &:nth-child(6) {
-      max-width: 250px;
-    }
+  th {
+    color: ${designSystem.colors.textSecondary};
+    font-weight: 600;
   }
 
   td {
-    padding: 12px 8px;
-    font-size: 14px;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-
-    &:nth-child(6) {
-      max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    color: ${designSystem.colors.textMain};
   }
 `
 
 export const Badge = styled.span<{ status: string }>`
+  display: inline-flex;
+  align-items: center;
   padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
   font-weight: 600;
-  white-space: nowrap;
-  border: 1px solid;
 
   background: ${({ status }) =>
     status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.1)'
+      ? '#fef2f2'
       : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.1)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.1)'
-      : 'rgba(16, 185, 129, 0.1)'};
-
-  border-color: ${({ status }) =>
-    status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.3)'
-      : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.3)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.3)'
-      : 'rgba(16, 185, 129, 0.3)'};
+        ? '#eff6ff'
+        : status === 'Aguardando'
+          ? '#fffbeb'
+          : '#ecfdf5'};
 
   color: ${({ status }) =>
     status === 'Aberto'
-      ? '#fca5a5'
+      ? '#b91c1c'
       : status === 'Em Andamento'
-      ? '#60a5fa'
-      : status === 'Aguardando'
-      ? '#fbbf24'
-      : '#6ee7b7'};
+        ? '#1d4ed8'
+        : status === 'Aguardando'
+          ? '#b45309'
+          : '#047857'};
+
+  border: 1px solid ${({ status }) =>
+    status === 'Aberto'
+      ? '#fecaca'
+      : status === 'Em Andamento'
+        ? '#bfdbfe'
+        : status === 'Aguardando'
+          ? '#fde68a'
+          : '#a7f3d0'};
 `

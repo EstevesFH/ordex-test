@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button } from '..//Button'
+import Button from '../Button'
 import * as S from './styles'
 
 export interface PaginationProps {
@@ -31,9 +31,7 @@ const Pagination = ({
 
   const changePage = (newPage: number) => {
     const validPage = Math.max(1, Math.min(newPage, totalPages))
-    if (!externalPage) {
-      setPage(validPage)
-    }
+    if (!externalPage) setPage(validPage)
     onPageChange(validPage)
   }
 
@@ -46,7 +44,6 @@ const Pagination = ({
     onItemsPerPageChange(newCount)
   }
 
-  // Sincronizar estado interno com props externas
   React.useEffect(() => {
     if (externalPage !== undefined) setPage(externalPage)
   }, [externalPage])
@@ -72,10 +69,10 @@ const Pagination = ({
       </div>
 
       <div>
-        <Button title="<<" disabled={page === 1} onClick={() => changePage(1)} />
-        <Button title="<" disabled={page === 1} onClick={() => changePage(page - 1)} />
-        <Button title=">" disabled={page === totalPages} onClick={() => changePage(page + 1)} />
-        <Button title=">>" disabled={page === totalPages} onClick={() => changePage(totalPages)} />
+        <Button disabled={page === 1} onClick={() => changePage(1)}>{'<<'}</Button>
+        <Button disabled={page === 1} onClick={() => changePage(page - 1)}>{'<'}</Button>
+        <Button disabled={page === totalPages} onClick={() => changePage(page + 1)}>{'>'}</Button>
+        <Button disabled={page === totalPages} onClick={() => changePage(totalPages)}>{'>>'}</Button>
       </div>
     </S.PaginationContainer>
   )

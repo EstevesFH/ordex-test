@@ -1,37 +1,28 @@
-import { useNavigate } from 'react-router-dom';
-import Iridescence from '../../../components/ReactBits/Iridescence';
-import * as S from './styles';
-import Button from '../../../components/Button';
+import { useNavigate } from 'react-router-dom'
+import Button from '../../../components/Button'
+import * as S from './styles'
 
 const HomePage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <S.FullPageContainer>
-      <Iridescence 
-        color={[0.12, 0.24, 0.45]}
-        speed={0.3}
-        amplitude={0.15}
-        mouseReact={false}
-      />
-
       <S.MainContent>
-        <S.HeroTitle>
-          <img src="/logo.PNG" alt="ORDEX Logo" width={400} height={80} />
-        </S.HeroTitle>
-        
-        <S.ButtonGroup>
-          <Button primary onClick={() => navigate('/register-os')}>
-            Novo Chamado
-          </Button>
+        <S.BrandCard>
+          <img src="/logo.PNG" alt="ORDEX Logo" width={280} height={56} />
+          <S.Subtitle>Sistema de abertura e acompanhamento de ordens de serviço</S.Subtitle>
 
-          <Button onClick={() => navigate('/login')}>
-            Painel de Gestão
-          </Button>
-        </S.ButtonGroup>
+          <S.ButtonGroup>
+            <Button primary onClick={() => navigate('/register')}>
+              Novo Chamado
+            </Button>
+            <Button onClick={() => navigate('/view-tickets')}>Consultar OS</Button>
+            <Button onClick={() => navigate('/login')}>Painel de Gestão</Button>
+          </S.ButtonGroup>
+        </S.BrandCard>
       </S.MainContent>
     </S.FullPageContainer>
-  );
-};
+  )
+}
 
-export { HomePage };
+export { HomePage }
