@@ -1,69 +1,61 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
 
 export const Header = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: ${ds.spacing.lg};
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: ${ds.spacing.md};
 
   h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #f1f5f9;
-    letter-spacing: -0.5px;
-    
-    background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: ${ds.typography.size.xxl};
+    font-weight: ${ds.typography.weight.bold};
+    color: ${ds.colors.textMain};
+    margin: 0;
   }
 `
 
 export const Controls = styled.div`
   display: flex;
-  gap: 12px;
+  gap: ${ds.spacing.sm};
   align-items: center;
   flex-wrap: wrap;
 `
 
 export const TableCard = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  padding: ${ds.spacing.lg};
+  border-radius: ${ds.radius.lg};
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
 `
 
 export const TableHeader = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: ${ds.spacing.md};
 
   h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #f1f5f9;
+    font-size: ${ds.typography.size.lg};
+    font-weight: ${ds.typography.weight.semibold};
+    color: ${ds.colors.textMain};
+    margin: 0;
   }
 `
 
 export const ErrorMessage = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #fca5a5;
-  font-size: 16px;
-  background: rgba(239, 68, 68, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 12px;
+  padding: ${ds.spacing.xl} ${ds.spacing.md};
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: ${ds.radius.md};
 `
 
 export const EmptyMessage = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-  font-size: 16px;
+  padding: ${ds.spacing.xl} ${ds.spacing.md};
+  color: ${ds.colors.textSecondary};
 `
 
 export const TruncatedText = styled.span`
@@ -71,33 +63,12 @@ export const TruncatedText = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
-  
-  &::after {
-    content: '';
-  }
+  max-width: 220px;
 `
 
 export const TableWrapper = styled.div`
-  max-height: 400px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    
-    &:hover {
-      background: rgba(148, 163, 184, 0.5);
-    }
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.2);
-  }
+  max-height: 460px;
+  overflow: auto;
 
   table {
     width: 100%;
@@ -106,29 +77,21 @@ export const TableWrapper = styled.div`
 
   th {
     text-align: left;
-    font-size: 13px;
-    color: #ffffff;
-    font-weight: 600;
-    padding-bottom: 12px;
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.textSecondary};
+    font-weight: ${ds.typography.weight.semibold};
+    padding: 10px 8px;
     position: sticky;
     top: 0;
-    //background: rgba(15, 23, 42, 0.9);
-    //backdrop-filter: blur(12px);
-
-    &:nth-child(6) {
-      max-width: 200px;
-    }
+    background: ${ds.colors.surface};
+    z-index: 1;
   }
 
   td {
     padding: 12px 8px;
-    font-size: 14px;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-
-    &:nth-child(6) {
-      max-width: 200px;
-    }
+    font-size: ${ds.typography.size.sm};
+    color: ${ds.colors.textMain};
+    border-bottom: 1px solid ${ds.colors.border};
   }
 `
 
@@ -136,36 +99,35 @@ export const Status = styled.span<{ status: string }>`
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+  font-weight: ${ds.typography.weight.semibold};
   border: 1px solid;
 
   background: ${({ status }) =>
     status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.1)'
+      ? '#fef2f2'
       : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.1)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.1)'
-      : 'rgba(16, 185, 129, 0.1)'};
+        ? '#eff6ff'
+        : status === 'Aguardando'
+          ? '#fffbeb'
+          : '#ecfdf5'};
 
   border-color: ${({ status }) =>
     status === 'Aberto'
-      ? 'rgba(239, 68, 68, 0.3)'
+      ? '#fecaca'
       : status === 'Em Andamento'
-      ? 'rgba(37, 99, 235, 0.3)'
-      : status === 'Aguardando'
-      ? 'rgba(245, 158, 11, 0.3)'
-      : 'rgba(16, 185, 129, 0.3)'};
+        ? '#bfdbfe'
+        : status === 'Aguardando'
+          ? '#fde68a'
+          : '#a7f3d0'};
 
   color: ${({ status }) =>
     status === 'Aberto'
-      ? '#fca5a5'
+      ? '#b91c1c'
       : status === 'Em Andamento'
-      ? '#60a5fa'
-      : status === 'Aguardando'
-      ? '#fbbf24'
-      : '#6ee7b7'};
+        ? '#1d4ed8'
+        : status === 'Aguardando'
+          ? '#b45309'
+          : '#047857'};
 `
 
 export const Actions = styled.div`
@@ -173,17 +135,17 @@ export const Actions = styled.div`
   gap: 8px;
 
   button {
-    border: none;
-    background: transparent;
+    border: 1px solid ${ds.colors.border};
+    background: ${ds.colors.surface};
+    border-radius: ${ds.radius.md};
     cursor: pointer;
-    font-size: 18px;
-    color: #94a3b8;
-    padding: 4px;
-    transition: all 0.2s ease;
+    font-size: 16px;
+    color: ${ds.colors.textSecondary};
+    padding: 6px;
 
     &:hover {
-      color: #60a5fa;
-      transform: scale(1.1);
+      color: ${ds.colors.primary};
+      border-color: ${ds.colors.primaryLight};
     }
   }
 `
