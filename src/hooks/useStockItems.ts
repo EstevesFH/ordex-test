@@ -174,7 +174,7 @@ export const useStockItems = () => {
         .insert([{
           stock_item_id: itemId,
           movement_type: movementType,
-          quantity: newQuantity - previousQuantity,
+          quantity: Math.abs(newQuantity - previousQuantity),
           previous_quantity: previousQuantity,
           new_quantity: newQuantity,
           ticket_id: ticketId,
@@ -228,13 +228,17 @@ export const useStockItems = () => {
         }
 
         // Atualizar quantidade
-        await updateQuantity(
+        const updateResult = await updateQuantity(
           part.stock_item_id,
           newQuantity,
           `Peça consumida na OS #${ticketId}`,
           ticketId,
           performedBy
         )
+
+        if (!updateResult.success) {
+          return { success: false, error: updateResult.error || 'Erro ao atualizar item no estoque' }
+        }
       }
 
       return { success: true }
