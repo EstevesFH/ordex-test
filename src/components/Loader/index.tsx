@@ -6,10 +6,8 @@ interface LoaderProps {
 
 const Loader = ({ fullPage = false }: LoaderProps) => {
   return (
-    <S.LoaderContainer>
-      <S.Wrapper $fullPage={fullPage}>
-        <S.Spinner />
-      </S.Wrapper>
+    <S.LoaderContainer $fullPage={fullPage}>
+      <S.Spinner />
     </S.LoaderContainer>
   )
 }
