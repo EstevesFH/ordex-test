@@ -1,48 +1,58 @@
-import styled from 'styled-components';
-import { designSystem } from '../../styles/designSystem';
+import styled from 'styled-components'
+import { designSystem as ds } from '@/styles/designSystem'
 
-// Interface para as props do Styled Component
 export interface StyledButtonProps {
-  $primary?: boolean;
+  $variant?: 'primary' | 'secondary' | 'tertiary'
+  $size?: 'small' | 'medium' | 'large'
+  $primary?: boolean
+}
+
+const paddingBySize = {
+  small: '6px 12px',
+  medium: '10px 16px',
+  large: '12px 20px',
 }
 
 export const ActionButton = styled.button<StyledButtonProps>`
-  padding: 16px 32px;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: 1rem;
+  padding: ${({ $size = 'medium' }) => paddingBySize[$size]};
+  border-radius: ${ds.radius.md};
+  font-weight: ${ds.typography.weight.semibold};
+  font-size: ${ds.typography.size.sm};
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  display: flex;
+  transition: ${ds.transitions.fast};
+  border: 1px solid transparent;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 
-  /* Lógica de Cores e Fundo */
-  background: ${props => props.$primary ? '#ffffff' : 'rgba(255, 255, 255, 0.2)'};
-  color: ${designSystem.colors.primary};
-  
-  /* Efeito de Vidro (Glassmorphism) */
-  backdrop-filter: ${props => props.$primary ? 'none' : 'blur(10px)'};
-  -webkit-backdrop-filter: ${props => props.$primary ? 'none' : 'blur(10px)'};
-  
-  /* Borda e Sombra */
-  border: ${props => props.$primary ? 'none' : '1px solid rgba(255, 255, 255, 0.5)'};
-  box-shadow: ${props => props.$primary ? '0 10px 20px rgba(0,0,0,0.05)' : 'none'};
+  background: ${({ $variant, $primary }) => {
+    if ($primary || $variant === 'primary') return ds.colors.primary
+    if ($variant === 'secondary') return ds.colors.surface
+    return 'transparent'
+  }};
+
+  color: ${({ $variant, $primary }) => {
+    if ($primary || $variant === 'primary') return ds.colors.white
+    if ($variant === 'secondary') return ds.colors.textMain
+    return ds.colors.textSecondary
+  }};
+
+  border-color: ${({ $variant, $primary }) => {
+    if ($primary || $variant === 'primary') return ds.colors.primary
+    return ds.colors.border
+  }};
 
   &:hover {
-    transform: translateY(-3px);
-    background: ${props => props.$primary ? '#f8fafc' : 'rgba(255, 255, 255, 0.4)'};
-  }
-
-  &:active {
-    transform: translateY(0);
+    background: ${({ $variant, $primary }) => {
+      if ($primary || $variant === 'primary') return ds.colors.primaryHover
+      if ($variant === 'secondary') return ds.colors.surfaceHover
+      return ds.colors.surfaceHover
+    }};
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
   }
-`;
+`
