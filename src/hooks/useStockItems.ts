@@ -138,7 +138,7 @@ export const useStockItems = () => {
     newQuantity: number,
     reason?: string,
     ticketId?: number,
-    performedBy?: number
+    performedBy?: string
   ) => {
     try {
       // Buscar item atual para obter quantidade anterior
@@ -203,7 +203,7 @@ export const useStockItems = () => {
   const consumeParts = useCallback(async (
     parts: { stock_item_id: number; quantity: number }[],
     ticketId: number,
-    performedBy?: number
+    performedBy?: string
   ) => {
     try {
       // Processar cada peça consumida
