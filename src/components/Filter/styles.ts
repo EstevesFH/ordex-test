@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { designSystem as ds } from '../../styles/designSystem'
 
 export const Overlay = styled.div`
   position: fixed;

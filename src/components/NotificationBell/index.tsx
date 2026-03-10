@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { FiBell, FiCheck, FiCheckCircle, FiTrash2, FiAlertCircle } from 'react-icons/fi'
-import { useNotifications } from '../../hooks/useNotifications'
+import { useNotifications } from '@/hooks/useNotifications'
 import type { Notification } from '../../types'
 
 interface NotificationBellProps {

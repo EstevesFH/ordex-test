@@ -1,5 +1,4 @@
 import styled, { keyframes } from 'styled-components'
-import { designSystem as ds } from '../../styles/designSystem'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

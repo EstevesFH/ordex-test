@@ -1,69 +1,13 @@
-import { FC } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { AppLayout } from './layouts/AppLayout'
-import { Dashboard } from './pages/private/Dashboard'
-import { Settings } from './pages/private/Settings'
-import { AccessesSettings } from './pages/private/Settings/Accesses'
-import { LocationsSettings } from './pages/private/Settings/Locations'
-import { ProductsSettings } from './pages/private/Settings/Products'
-import { Stock } from './pages/private/Stock'
-import { Tickets } from './pages/private/Tickets'
-import { ForgotPassword } from './pages/public/ForgotPassword'
-import { Login } from './pages/public/Login'
-import { RegisterOS } from './pages/public/RegisterOS'
-import { ResetPassword } from './pages/public/ResetPassword'
-import { designSystem } from './styles/designSystem'
-
-type AppRole = 'Administrador' | 'Operador'
-
-interface SessionUser {
-  id: number
-  username: string
-  name: string
-  role: AppRole | string
-  lastActive: number
-}
-
-const getSessionUser = (): SessionUser | null => {
-  const raw = localStorage.getItem('user')
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as SessionUser
-  } catch {
-    localStorage.removeItem('user')
-    return null
-  }
-}
-
-const getLandingByRole = (role: string) => (role === 'Operador' ? '/tickets' : '/dashboard')
-
-const PublicOnlyRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = getSessionUser()
-  if (!user) return <>{children}</>
-  return <Navigate to={getLandingByRole(user.role)} replace />
-}
-
-const ProtectedRoute: FC<{ children: React.ReactNode; allowedRoles?: AppRole[] }> = ({
-  children,
-  allowedRoles,
-}) => {
-  const user = getSessionUser()
-
-  if (!user) return <Navigate to="/login" replace />
-
-  if (allowedRoles && !allowedRoles.includes(user.role as AppRole)) {
-    return <Navigate to={getLandingByRole(user.role)} replace />
-  }
-
-  return <>{children}</>
-}
-
-const RoleHomeRedirect = () => {
-  const user = getSessionUser()
-  if (!user) return <Navigate to="/login" replace />
-  return <Navigate to={getLandingByRole(user.role)} replace />
-}
+import { FC } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { AppLayout } from './layouts/AppLayout';
+import { HomePage } from './pages/public/Home';
+import { Login } from './pages/public/Login';
+import { RegisterOS } from './pages/public/RegisterOS';
+import { ViewTickets } from './pages/public/ViewTickets';
+import { ForgotPassword } from './pages/public/ForgotPassword';
+import { Dashboard } from './pages/private/Dashboard';
+import { designSystem } from './styles/designSystem';
 
 const NotFound: FC = () => (
   <div
