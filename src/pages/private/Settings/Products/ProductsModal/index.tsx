@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../../../../services/supabase'
 import * as S from './styles'
 import { Button } from '../../../../../components/Button'
-import { Product } from '../index'
+import type { Product } from '../index'
 
 interface ProductsModalProps {
   product?: Product
