@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../../../services/supabase'
-import { FiEdit } from 'react-icons/fi'
+import { FiEdit, FiKey } from 'react-icons/fi'
 import * as S from './styles'
 import { Loader } from '../../../../components/Loader'
 import { Pagination } from '../../../../components/Pagination'
 import { Button } from '../../../../components/Button'
-import { Filter, FilterField } from '../../../../components/Filter'
+import { Filter } from '../../../../components/Filter'
+import type { FilterField } from '../../../../components/Filter'
 import { AccessesModal } from './AccessesModal'
 
 export interface Accesses {
   id: number
   name: string
-  username: string
-  password: string
+  email: string
   role: string
   status: 'Ativo' | 'Inativo'
 }
@@ -65,9 +65,23 @@ const AccessesSettings = () => {
   const openEdit = (accesses: Accesses) => { setSelectedAccesses(accesses); setModalMode('edit') }
   const closeModal = () => { setSelectedAccesses(null); setModalMode(null) }
 
+  const handleResetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+
+    if (error) {
+      alert('Erro ao enviar e-mail de redefinição de senha')
+      return
+    }
+
+    alert(`E-mail de redefinição enviado para ${email}`)
+  }
+
   const filteredAccesses = accesses
     .filter(a =>
-      a.name.toLowerCase().includes(search.toLowerCase()) &&
+      (a.name.toLowerCase().includes(search.toLowerCase()) ||
+       a.email.toLowerCase().includes(search.toLowerCase())) &&
       (filterRole ? a.role === filterRole : true) &&
       (filterStatus ? a.status === filterStatus : true)
     )
@@ -79,7 +93,7 @@ const AccessesSettings = () => {
   )
 
   const filterFields: FilterField[] = [
-    { label: 'Nome', type: 'text', value: search, onChange: setSearch },
+    { label: 'Nome ou e-mail', type: 'text', value: search, onChange: setSearch },
     { label: 'Função', type: 'select', value: filterRole, onChange: setFilterRole, options: roles },
     { label: 'Status', type: 'select', value: filterStatus, onChange: setFilterStatus, options: statusOptions }
   ]
@@ -95,6 +109,7 @@ const AccessesSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterRole('')
@@ -103,7 +118,7 @@ const AccessesSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
           <Button title="Novo Acesso" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>
@@ -119,7 +134,7 @@ const AccessesSettings = () => {
                   <tr>
                     <th>#</th>
                     <th>Nome</th>
-                    <th>Username</th>
+                    <th>E-mail</th>
                     <th>Função</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -130,12 +145,13 @@ const AccessesSettings = () => {
                     <tr key={accesses.id}>
                       <td>{accesses.id}</td>
                       <td>{accesses.name}</td>
-                      <td>{accesses.username}</td>
+                      <td>{accesses.email}</td>
                       <td>{accesses.role}</td>
                       <td><S.Status status={accesses.status}>{accesses.status}</S.Status></td>
                       <td>
                         <S.Actions>
-                          <button onClick={() => openEdit(accesses)}><FiEdit /></button>
+                          <button title="Editar" onClick={() => openEdit(accesses)}><FiEdit /></button>
+                          <button title="Redefinir senha" onClick={() => handleResetPassword(accesses.email)}><FiKey /></button>
                         </S.Actions>
                       </td>
                     </tr>

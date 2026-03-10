@@ -7,7 +7,8 @@ import * as S from './styles'
 import { Loader } from '../../../components/Loader'
 import { Pagination } from '../../../components/Pagination'
 import { Button } from '../../../components/Button'
-import { Filter, FilterField } from '../../../components/Filter'
+import { Filter } from '../../../components/Filter'
+import type { FilterField } from '../../../components/Filter'
 
 const Tickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -127,12 +128,14 @@ const Tickets = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={clearFilters}
             />
           )}
           <Button 
             title="Filtrar" 
             variant="secondary" 
+            size="small"
             onClick={() => setIsFilterOpen(true)} 
           />
         </S.Controls>

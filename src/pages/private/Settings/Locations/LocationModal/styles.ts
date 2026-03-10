@@ -1,72 +1,62 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../../../../styles/designSystem'
 
 export const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(2, 6, 23, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 20px;
+  padding: ${ds.spacing.md};
 `
 
 export const Modal = styled.div`
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 32px;
-  border-radius: 20px;
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  padding: ${ds.spacing.xl};
+  border-radius: ${ds.radius.lg};
   width: 100%;
   max-width: 540px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(2, 6, 23, 0.2);
 `
 
 export const Title = styled.h2`
-  font-size: 22px;
-  font-weight: 700;
-  color: #f1f5f9;
-  margin-bottom: 24px;
-  letter-spacing: -0.3px;
+  font-size: ${ds.typography.size.xl};
+  font-weight: ${ds.typography.weight.bold};
+  color: ${ds.colors.textMain};
+  margin: 0 0 ${ds.spacing.lg};
 `
 
 export const Field = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: ${ds.spacing.md};
 
   label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #e2e8f0;
+    font-size: ${ds.typography.size.sm};
+    font-weight: ${ds.typography.weight.semibold};
+    color: ${ds.colors.textSecondary};
   }
 
   input,
   select {
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    background: rgba(0, 0, 0, 0.2);
-    color: #f1f5f9;
-    transition: all 0.3s ease;
-    
-    &::placeholder {
-      color: #64748b;
-    }
-    
+    padding: 10px 14px;
+    border-radius: ${ds.radius.md};
+    border: 1px solid ${ds.colors.border};
+    font-size: ${ds.typography.size.base};
+    background: ${ds.colors.surface};
+    color: ${ds.colors.textMain};
+
     &:focus {
       outline: none;
-      border-color: #3b82f6;
-      background: rgba(0, 0, 0, 0.3);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: ${ds.colors.primaryLight};
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
   }
-  
+
   select {
     cursor: pointer;
   }
@@ -75,5 +65,6 @@ export const Field = styled.div`
 export const Actions = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: ${ds.spacing.sm};
+  margin-top: ${ds.spacing.lg};
 `

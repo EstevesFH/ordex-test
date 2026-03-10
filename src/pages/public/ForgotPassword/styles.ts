@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '../../../styles/designSystem'
 
 export const Container = styled.div`
   width: 100%;
@@ -6,78 +7,54 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at top left, #1e3a8a 0%, #0f172a 50%, #020617 100%);
-  background-attachment: fixed;
-  padding: 24px;
+  padding: ${ds.spacing.lg};
+  background: ${ds.colors.background};
 `
 
 export const Card = styled.div`
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 48px;
-  border-radius: 24px;
   width: 100%;
-  max-width: 500px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  max-width: 520px;
+  background: ${ds.colors.backgroundCard};
+  border: 1px solid ${ds.colors.border};
+  border-radius: ${ds.radius.xl};
+  padding: ${ds.spacing.xl};
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-
-  @media (max-width: 600px) {
-    padding: 32px 24px;
-  }
+  gap: ${ds.spacing.md};
 `
 
 export const IconHeader = styled.div`
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: ${ds.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
 `
 
 export const SuccessIcon = styled.div`
-  margin-bottom: 8px;
-  animation: scaleIn 0.5s ease-out;
-
-  @keyframes scaleIn {
-    from {
-      transform: scale(0);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
+  margin-bottom: ${ds.spacing.xs};
 `
 
 export const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 700;
-  text-align: center;
-  color: #f1f5f9;
   margin: 0;
-  letter-spacing: -0.5px;
+  font-size: ${ds.typography.size.xl};
+  font-weight: ${ds.typography.weight.bold};
+  color: ${ds.colors.textMain};
+  text-align: center;
 `
 
 export const Subtitle = styled.p`
-  font-size: 15px;
-  color: #cbd5e1;
-  text-align: center;
   margin: 0;
+  text-align: center;
+  color: ${ds.colors.textSecondary};
   line-height: 1.6;
 
   strong {
-    color: #60a5fa;
-    font-weight: 600;
+    color: ${ds.colors.textMain};
   }
 `
 
@@ -85,94 +62,70 @@ export const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-top: 8px;
+  gap: ${ds.spacing.md};
 `
 
 export const Field = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
 
   label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #cbd5e1;
+    font-size: ${ds.typography.size.sm};
+    font-weight: ${ds.typography.weight.semibold};
+    color: ${ds.colors.textMain};
   }
 
   input {
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
+    width: 100%;
+    border: 1px solid ${ds.colors.border};
+    background: ${ds.colors.surface};
+    border-radius: ${ds.radius.md};
+    padding: 12px;
+    color: ${ds.colors.textMain};
 
     &:focus {
       outline: none;
-      border-color: #3b82f6;
-    }
-
-    &::placeholder {
-      color: #94a3b8;
+      border-color: ${ds.colors.primaryLight};
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
   }
 `
 
 export const ErrorMessage = styled.div`
-  background: rgba(239, 68, 68, 0.1);
-  color: #fca5a5;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-left: 4px solid #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: ${ds.spacing.sm};
+  border-radius: ${ds.radius.md};
+  font-size: ${ds.typography.size.sm};
 `
 
 export const InfoBox = styled.div`
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(8px);
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
   width: 100%;
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  border-radius: ${ds.radius.md};
+  padding: ${ds.spacing.md};
 
   p {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    color: #f1f5f9;
+    margin: 0 0 ${ds.spacing.xs};
+    color: ${ds.colors.textMain};
   }
 
   ul {
     margin: 0;
-    padding-left: 20px;
-    
-    li {
-      font-size: 13px;
-      color: #cbd5e1;
-      margin: 6px 0;
-      line-height: 1.5;
-    }
+    padding-left: ${ds.spacing.lg};
+    color: ${ds.colors.textSecondary};
   }
 `
 
 export const BackLink = styled.button`
-  background: transparent;
   border: none;
-  color: #60a5fa;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
+  background: transparent;
+  color: ${ds.colors.primary};
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  margin-top: 8px;
-
-  &:hover {
-    background: rgba(59, 130, 246, 0.1);
-  }
+  cursor: pointer;
 `

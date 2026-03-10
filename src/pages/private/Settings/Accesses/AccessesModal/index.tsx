@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../../../../services/supabase'
 import * as S from './styles'
 import { Button } from '../../../../../components/Button'
-import { Accesses } from '../index'
+import type { Accesses } from '../index'
 
 interface AccessesModalProps {
   accesses?: Accesses
@@ -14,8 +14,7 @@ interface AccessesModalProps {
 const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProps) => {
   const isEdit = mode === 'edit'
   const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [role, setRole] = useState('')
   const [status, setStatus] = useState<'Ativo' | 'Inativo'>('Ativo')
   const [saving, setSaving] = useState(false)
@@ -23,15 +22,14 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
   useEffect(() => {
     if (isEdit && accesses) {
       setName(accesses.name)
-      setUsername(accesses.username)
-      setPassword(accesses.password)
+      setEmail(accesses.email)
       setRole(accesses.role)
       setStatus(accesses.status)
     }
   }, [isEdit, accesses])
 
   const handleSave = async () => {
-    if (!name.trim() || !username.trim() || !role.trim()) {
+    if (!name.trim() || !email.trim() || !role.trim()) {
       alert('Preencha todos os campos obrigatórios')
       return
     }
@@ -39,16 +37,41 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
     setSaving(true)
 
     if (mode === 'create') {
-      const { error } = await supabase.from('accesses').insert({ name, username, password, role, status: 'Ativo' })
-      if (error) { alert('Erro ao criar acesso'); setSaving(false); return }
+      const { error } = await supabase.from('accesses').insert({
+        name,
+        email,
+        role,
+        status: 'Ativo',
+      })
+
+      if (error) {
+        alert('Erro ao criar acesso')
+        setSaving(false)
+        return
+      }
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+
+      if (resetError) {
+        alert('Acesso criado, mas falhou ao enviar e-mail de criação de senha.')
+      } else {
+        alert(`Acesso criado e e-mail enviado para ${email} criar a senha.`)
+      }
     }
 
     if (mode === 'edit' && accesses) {
       const { error } = await supabase
         .from('accesses')
-        .update({ name, username, password, role, status })
+        .update({ name, email, role, status })
         .eq('id', accesses.id)
-      if (error) { alert('Erro ao atualizar acesso'); setSaving(false); return }
+
+      if (error) {
+        alert('Erro ao atualizar acesso')
+        setSaving(false)
+        return
+      }
     }
 
     setSaving(false)
@@ -58,7 +81,7 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
   return (
     <S.Overlay onClick={onClose}>
       <S.Modal onClick={e => e.stopPropagation()}>
-        <S.Title>{isEdit ? 'Editar Accesses' : 'Novo Accesses'}</S.Title>
+        <S.Title>{isEdit ? 'Editar Acesso' : 'Novo Acesso'}</S.Title>
 
         <S.Field>
           <label>Nome</label>
@@ -66,13 +89,8 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
         </S.Field>
 
         <S.Field>
-          <label>Username</label>
-          <input value={username} onChange={e => setUsername(e.target.value)} />
-        </S.Field>
-
-        <S.Field>
-          <label>Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+          <label>E-mail</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
         </S.Field>
 
         <S.Field>

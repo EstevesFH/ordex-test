@@ -6,7 +6,8 @@ import { Loader } from '../../../../components/Loader'
 import { Pagination } from '../../../../components/Pagination'
 import { Button } from '../../../../components/Button'
 import { LocationModal } from './LocationModal'
-import { Filter, FilterField } from '../../../../components/Filter'
+import { Filter } from '../../../../components/Filter'
+import type { FilterField } from '../../../../components/Filter'
 
 export interface Location {
   id: number
@@ -75,6 +76,7 @@ const LocationsSettings = () => {
             <Button
               title="Limpar filtros"
               variant="secondary"
+              size="small"
               onClick={() => {
                 setSearch('')
                 setFilterStatus('')
@@ -82,7 +84,7 @@ const LocationsSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
+          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
           <Button title="Novo Local" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>

@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { FiMail, FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../services/supabase'
+import { Button } from '../../../components/Button'
+import * as S from './styles'
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate()
@@ -37,120 +39,55 @@ const ForgotPassword: React.FC = () => {
     }
   }
 
-  const handleBackToLogin = () => {
-    navigate('/login')
-  }
+  const handleBackToLogin = () => navigate('/login')
 
   if (success) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0f172a',
-        padding: '24px'
-      }}>
-        <div style={{
-          background: '#1e293b',
-          padding: '48px',
-          borderRadius: '16px',
-          maxWidth: '500px',
-          width: '100%',
-          textAlign: 'center'
-        }}>
-          <div style={{ marginBottom: '24px' }}>
-            <FiCheckCircle size={64} color="#10b981" />
-          </div>
+      <S.Container>
+        <S.Card>
+          <S.SuccessIcon>
+            <FiCheckCircle size={60} color="#10b981" />
+          </S.SuccessIcon>
 
-          <h1 style={{ color: 'white', fontSize: '24px', marginBottom: '16px' }}>
-            E-mail Enviado!
-          </h1>
-          <p style={{ color: '#94a3b8', marginBottom: '24px' }}>
-            Enviamos um link de recuperação de senha para <strong>{email}</strong>.
-            Verifique sua caixa de entrada e siga as instruções.
-          </p>
+          <S.Title>E-mail enviado</S.Title>
+          <S.Subtitle>
+            Enviamos um link de recuperação para <strong>{email}</strong>.
+            Verifique sua caixa de entrada para criar/redefinir sua senha.
+          </S.Subtitle>
 
-          <div style={{
-            background: '#334155',
-            padding: '16px',
-            borderRadius: '8px',
-            marginBottom: '24px',
-            textAlign: 'left'
-          }}>
-            <p style={{ color: 'white', fontWeight: '600', marginBottom: '8px' }}>
-              Não recebeu o e-mail?
-            </p>
-            <ul style={{ color: '#94a3b8', fontSize: '14px', paddingLeft: '20px' }}>
-              <li>Verifique sua caixa de spam</li>
-              <li>Confirme se o e-mail está correto</li>
-              <li>Aguarde alguns minutos e tente novamente</li>
+          <S.InfoBox>
+            <p><strong>Não recebeu o e-mail?</strong></p>
+            <ul>
+              <li>Verifique sua caixa de spam.</li>
+              <li>Confirme se o e-mail informado está correto.</li>
+              <li>Aguarde alguns minutos e tente novamente.</li>
             </ul>
-          </div>
+          </S.InfoBox>
 
-          <button
-            onClick={handleBackToLogin}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiArrowLeft size={18} />
+          <Button onClick={handleBackToLogin} style={{ width: '100%' }}>
+            <FiArrowLeft size={16} />
             Voltar para Login
-          </button>
-        </div>
-      </div>
+          </Button>
+        </S.Card>
+      </S.Container>
     )
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#0f172a',
-      padding: '24px'
-    }}>
-      <div style={{
-        background: '#1e293b',
-        padding: '48px',
-        borderRadius: '16px',
-        maxWidth: '440px',
-        width: '100%'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <FiMail size={48} color="#3b82f6" />
-        </div>
+    <S.Container>
+      <S.Card>
+        <S.IconHeader>
+          <FiMail size={32} color="#ffffff" />
+        </S.IconHeader>
 
-        <h1 style={{ color: 'white', fontSize: '24px', textAlign: 'center', marginBottom: '8px' }}>
-          Esqueceu sua senha?
-        </h1>
-        <p style={{ color: '#94a3b8', textAlign: 'center', marginBottom: '32px' }}>
-          Digite seu e-mail e enviaremos instruções para redefinir sua senha.
-        </p>
+        <S.Title>Esqueci minha senha</S.Title>
+        <S.Subtitle>
+          Digite seu e-mail para receber um link de redefinição de senha.
+        </S.Subtitle>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              color: '#f1f5f9',
-              marginBottom: '8px',
-              fontWeight: '500'
-            }}>
-              E-mail
-            </label>
+        <S.Form onSubmit={handleSubmit}>
+          <S.Field>
+            <label>E-mail</label>
             <input
               type="email"
               value={email}
@@ -158,71 +95,22 @@ const ForgotPassword: React.FC = () => {
               required
               placeholder="seu@email.com"
               autoFocus
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: '#334155',
-                border: '1px solid #475569',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '15px',
-                outline: 'none'
-              }}
             />
-          </div>
+          </S.Field>
 
-          {error && (
-            <div style={{
-              padding: '12px',
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              color: '#fca5a5',
-              marginBottom: '20px',
-              fontSize: '14px'
-            }}>
-              {error}
-            </div>
-          )}
+          {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: loading ? '#6b7280' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Enviando...' : 'Enviar Link de Recuperação'}
-          </button>
-        </form>
+          <Button type="submit" disabled={loading} style={{ width: '100%' }}>
+            {loading ? 'Enviando...' : 'Enviar link de redefinição'}
+          </Button>
+        </S.Form>
 
-        <div
-          onClick={handleBackToLogin}
-          style={{
-            marginTop: '24px',
-            textAlign: 'center',
-            color: '#3b82f6',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            fontSize: '14px'
-          }}
-        >
+        <S.BackLink onClick={handleBackToLogin}>
           <FiArrowLeft size={16} />
-          Voltar para o login
-        </div>
-      </div>
-    </div>
+          Voltar para login
+        </S.BackLink>
+      </S.Card>
+    </S.Container>
   )
 }
 

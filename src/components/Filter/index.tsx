@@ -1,6 +1,7 @@
 import React from 'react'
-import * as S from './styles'
 import { FiX } from 'react-icons/fi'
+import { Button } from '../Button'
+import * as S from './styles'
 
 export type FilterField = {
   label: string
@@ -25,7 +26,9 @@ export const Filter = ({ isOpen, onClose, fields, onApply }: FilterProps) => {
       <S.Modal onClick={e => e.stopPropagation()}>
         <S.Header>
           <h2>Filtrar</h2>
-          <button onClick={onClose}><FiX size={20} /></button>
+          <S.CloseButton onClick={onClose}>
+            <FiX size={18} />
+          </S.CloseButton>
         </S.Header>
 
         <S.Content>
@@ -67,8 +70,8 @@ export const Filter = ({ isOpen, onClose, fields, onApply }: FilterProps) => {
         </S.Content>
 
         <S.Footer>
-          <button className="secondary" onClick={onClose}>Cancelar</button>
-          <button className="primary" onClick={onApply}>Aplicar</button>
+          <Button variant="secondary" size="small" onClick={onClose}>Cancelar</Button>
+          <Button size="small" onClick={onApply}>Aplicar</Button>
         </S.Footer>
       </S.Modal>
     </S.Overlay>

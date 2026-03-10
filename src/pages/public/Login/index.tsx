@@ -2,12 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { FiMail, FiLock } from 'react-icons/fi'
 import { supabase } from '../../../services/supabase'
-import Iridescence from '../../../components/ReactBits/Iridescence'
 import Button from '../../../components/Button'
 import * as S from './styles'
 
+type AppRole = 'Administrador' | 'Operador'
+
+interface AccessRecord {
+  id: number
+  name: string
+  email: string
+  role: AppRole | string
+  status: 'Ativo' | 'Inativo'
+}
+
 const Login = () => {
-  const [login, setLogin] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,7 +32,7 @@ const Login = () => {
     const fifteenMinutes = 15 * 60 * 1000
 
     if (now - (user.lastActive || now) < fifteenMinutes) {
-      navigate('/dashboard')
+      navigate(user.role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
     }
   }, [navigate])
 
@@ -33,28 +42,44 @@ const Login = () => {
     setError('')
 
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('accesses')
-        .select('*')
-        .eq('username', login)
-        .eq('password', password)
-        .ilike('status', 'ativo')
-        .single()
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      if (supabaseError || !data) {
-        setError('Usuário ou senha inválidos.')
+      if (authError) {
+        setError('E-mail ou senha inválidos.')
         return
       }
 
-      localStorage.setItem('user', JSON.stringify({
-        id: data.id,
-        username: data.username,
-        name: data.name,
-        role: data.role,
-        lastActive: Date.now()
-      }))
+      const { data, error: accessError } = await supabase
+        .from('accesses')
+        .select('*')
+        .eq('email', email)
+        .ilike('status', 'ativo')
+        .single()
 
-      navigate('/dashboard')
+      if (accessError || !data) {
+        await supabase.auth.signOut()
+        setError('Acesso não encontrado ou inativo.')
+        return
+      }
+
+      const access = data as AccessRecord
+      const role = ((access.role as string) || 'Operador') as AppRole
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: access.id,
+          username: access.email,
+          name: access.name,
+          role,
+          lastActive: Date.now(),
+        }),
+      )
+
+      navigate(role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
     } catch (err) {
       console.error(err)
       setError('Erro ao autenticar. Tente novamente.')
@@ -65,13 +90,6 @@ const Login = () => {
 
   return (
     <S.Container>
-      <Iridescence 
-        color={[0.12, 0.24, 0.45]}
-        speed={0.3}                
-        amplitude={0.15}           
-        mouseReact={false}
-      />
-
       <S.LoginCard>
         <S.LogoWrapper>
           <div className="icon-box">
@@ -83,14 +101,14 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <S.InputGroup>
-            <label>Usuário</label>
+            <label>E-mail</label>
             <div className="input-wrapper">
               <FiMail size={18} />
               <input
-                type="text"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                placeholder="nome.usuario"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="nome@empresa.com"
                 required
               />
             </div>
@@ -103,7 +121,7 @@ const Login = () => {
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
               />
@@ -117,19 +135,8 @@ const Login = () => {
           </S.ForgotLink>
 
           <S.ActionWrapper>
-            <Button 
-              primary 
-              type="submit" 
-              disabled={loading}
-            >
+            <Button primary type="submit" disabled={loading}>
               {loading ? 'Autenticando...' : 'Entrar'}
-            </Button>
-            
-            <Button 
-              type="button" 
-              onClick={() => navigate('/')}
-            >
-              Voltar
             </Button>
           </S.ActionWrapper>
         </form>
