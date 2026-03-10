@@ -171,7 +171,7 @@ export interface StockMovement {
   new_quantity: number
   ticket_id?: number | null
   reason?: string | null
-  performed_by?: number | null
+  performed_by?: string | null
   created_at: string
 }
 
