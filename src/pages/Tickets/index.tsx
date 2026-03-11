@@ -25,7 +25,7 @@ const Tickets = () => {
   const [filterPrioridade, setFilterPrioridade] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const isSupervisor = getSessionUser()?.role === 'Supervisor'
+  const canEditTickets = getSessionUser()?.role === 'Administrador'
 
   const fetchTickets = async () => {
     setLoading(true)
@@ -169,7 +169,7 @@ const Tickets = () => {
                       >
                         <FiEye />
                       </button>
-                      {!isSupervisor && (
+                      {canEditTickets && (
                         <button 
                           onClick={() => openEdit(ticket)}
                           aria-label="Editar ticket"

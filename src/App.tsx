@@ -21,10 +21,17 @@ const PublicOnlyRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   return <Navigate to={getLandingByRole(user.role)} replace />
 }
 
-const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: FC<{ children: React.ReactNode; allowedRoles?: AppRole[] }> = ({
+  children,
+  allowedRoles,
+}) => {
   const user = getSessionUser()
 
   if (!user) return <Navigate to="/login" replace />
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={getLandingByRole(user.role)} replace />
+  }
 
   return <>{children}</>
 }
@@ -116,7 +123,7 @@ const App: FC = () => (
       <Route
         path="/settings/*"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Administrador']}>
             <Settings />
           </ProtectedRoute>
         }
@@ -139,7 +146,7 @@ const App: FC = () => (
       <Route
         path="/register"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Administrador', 'Operador']}>
             <RegisterOS />
           </ProtectedRoute>
         }
