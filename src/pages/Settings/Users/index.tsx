@@ -10,7 +10,7 @@ import { Filter } from '@/components/Filter'
 import type { FilterField } from '@/components/Filter'
 
 export interface User {
-  id: number
+  id: string
   userName: string
   status: 'Ativo' | 'Inativo'
 }
@@ -18,10 +18,11 @@ export interface User {
 const UsersSettings = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null)
+  const [modalMode, setModalMode] = useState<'edit' | null>(null)
 
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -29,18 +30,32 @@ const UsersSettings = () => {
 
   const fetchUsers = async () => {
     setLoading(true)
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .order('id', { ascending: false })
+    setError(null)
+    const { data, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id, name, email, status')
+      .order('name', { ascending: true })
 
-    if (data) setUsers(data as User[])
+    if (fetchError) {
+      console.error(fetchError)
+      setError('Erro ao carregar usuários')
+      setUsers([])
+    }
+
+    if (data) {
+      setUsers(
+        data.map(item => ({
+          id: String(item.id),
+          userName: String(item.name || item.email || item.id),
+          status: item.status === 'Inativo' ? 'Inativo' : 'Ativo',
+        }))
+      )
+    }
     setLoading(false)
   }
 
   useEffect(() => { fetchUsers() }, [])
 
-  const openCreate = () => { setSelectedUser(null); setModalMode('create') }
   const openEdit = (user: User) => { setSelectedUser(user); setModalMode('edit') }
   const closeModal = () => { setSelectedUser(null); setModalMode(null) }
 
@@ -81,12 +96,13 @@ const UsersSettings = () => {
             />
           )}
           <Button title="Filtrar" variant="secondary" onClick={() => setIsFilterOpen(true)} />
-          <Button title="Novo Usuário" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>
 
       <S.TableCard>
-        {filteredUsers.length === 0 ? (
+        {error ? (
+          <S.NoData>{error}</S.NoData>
+        ) : filteredUsers.length === 0 ? (
           <S.NoData>Nenhum usuário encontrado</S.NoData>
         ) : (
           <>

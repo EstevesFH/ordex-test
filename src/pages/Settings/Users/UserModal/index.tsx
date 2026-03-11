@@ -34,24 +34,16 @@ const UserModal = ({ user, mode, onClose, onUpdated }: UserModalProps) => {
     setSaving(true)
 
     if (mode === 'create') {
-      const { error } = await supabase.from('users').insert({
-        userName,
-        status: 'Ativo',
-      })
-
-      if (error) {
-        console.error(error)
-        alert('Erro ao criar usuário')
-        setSaving(false)
-        return
-      }
+      alert('Criação por esta tela indisponível. Use Configurações > Acessos.')
+      setSaving(false)
+      return
     }
 
     if (mode === 'edit' && user) {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({
-          userName,
+          name: userName,
           status,
         })
         .eq('id', user.id)

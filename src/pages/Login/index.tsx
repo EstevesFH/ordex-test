@@ -2,10 +2,66 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { FiMail, FiLock } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { getLandingByRole, normalizeRole, type AppRole } from '@/utils/session'
 import Button from '@/components/Button'
 import * as S from './styles'
 
-type AppRole = 'Administrador' | 'Operador'
+type ProfileData = {
+  name?: string | null
+  role?: string | null
+  status?: string | null
+}
+
+const getStoredUserRole = (userId: string) => {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { id?: string; role?: string }
+    if (parsed?.id !== userId) return null
+    return parsed?.role || null
+  } catch {
+    return null
+  }
+}
+
+const getProfileData = async (userId: string, email?: string | null): Promise<ProfileData | null> => {
+  const byId = await supabase
+    .from('profiles')
+    .select('name, role, status')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (!byId.error && byId.data) return byId.data as ProfileData
+
+  if (email) {
+    const byEmail = await supabase
+      .from('profiles')
+      .select('name, role, status')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (!byEmail.error && byEmail.data) return byEmail.data as ProfileData
+  }
+
+  return null
+}
+
+const getResolvedRole = (
+  profileData: ProfileData | null,
+  authUser: { app_metadata?: { role?: string }; user_metadata?: { role?: string }; id: string },
+) => {
+  const rawRole =
+    profileData?.role ||
+    authUser.app_metadata?.role ||
+    authUser.user_metadata?.role ||
+    getStoredUserRole(authUser.id) ||
+    'Operador'
+
+  return normalizeRole(rawRole) as AppRole
+}
+
+const getResolvedStatus = (profileData: ProfileData | null, authUser: { app_metadata?: { status?: string } }) =>
+  ((profileData?.status as string) || (authUser.app_metadata?.status as string) || 'Ativo').toLowerCase()
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -16,16 +72,43 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (!userStr) return
+    const restoreSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const user = sessionData.session?.user
+      if (!user) return
 
-    const user = JSON.parse(userStr)
-    const now = Date.now()
-    const fifteenMinutes = 15 * 60 * 1000
+      const profileData = await getProfileData(user.id, user.email)
 
-    if (now - (user.lastActive || now) < fifteenMinutes) {
-      navigate(user.role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
+      const role = getResolvedRole(profileData, user)
+      const status = getResolvedStatus(profileData, user)
+
+      if (status !== 'ativo') {
+        await supabase.auth.signOut()
+        localStorage.removeItem('user')
+        return
+      }
+
+      const displayName =
+        (profileData?.name as string) ||
+        (user.user_metadata?.name as string) ||
+        (user.email?.split('@')[0] as string) ||
+        'Usuário'
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: user.id,
+          username: user.email,
+          name: displayName,
+          role,
+          lastActive: Date.now(),
+        }),
+      )
+
+      navigate(getLandingByRole(role), { replace: true })
     }
+
+    restoreSession()
   }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,11 +127,17 @@ const Login = () => {
         return
       }
 
-      const role = ((signInData.user.app_metadata?.role as string) || 'Operador') as AppRole
-      const status = ((signInData.user.app_metadata?.status as string) || 'Ativo').toLowerCase()
+      const { data: currentUserData } = await supabase.auth.getUser()
+      const currentUser = currentUserData.user || signInData.user
+
+      const profileData = await getProfileData(currentUser.id, currentUser.email)
+
+      const role = getResolvedRole(profileData, currentUser)
+      const status = getResolvedStatus(profileData, currentUser)
       const displayName =
-        (signInData.user.user_metadata?.name as string) ||
-        (signInData.user.email?.split('@')[0] as string) ||
+        (profileData?.name as string) ||
+        (currentUser.user_metadata?.name as string) ||
+        (currentUser.email?.split('@')[0] as string) ||
         'Usuário'
 
       if (status !== 'ativo') {
@@ -60,15 +149,15 @@ const Login = () => {
       localStorage.setItem(
         'user',
         JSON.stringify({
-          id: signInData.user.id,
-          username: signInData.user.email,
+          id: currentUser.id,
+          username: currentUser.email,
           name: displayName,
           role,
           lastActive: Date.now(),
         }),
       )
 
-      navigate(role === 'Operador' ? '/tickets' : '/dashboard', { replace: true })
+      navigate(getLandingByRole(role), { replace: true })
     } catch (err) {
       console.error(err)
       setError('Erro ao autenticar. Tente novamente.')
