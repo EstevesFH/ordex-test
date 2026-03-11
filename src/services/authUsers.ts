@@ -2,33 +2,29 @@ import { supabase } from './supabase'
 
 type UserStatus = 'Ativo' | 'Inativo'
 
-type ManageAuthUsersAction = 'create' | 'update_user'
+type ManageAuthUsersAction = 'list' | 'create' | 'update' | 'reset_password'
+
+const formatInvokeError = (error: unknown): Error => {
+  if (error instanceof Error) {
+    const details = (error as Error & { context?: unknown; cause?: unknown })
+    const contextText = details.context ? ` | context: ${JSON.stringify(details.context)}` : ''
+    const causeText = details.cause ? ` | cause: ${String(details.cause)}` : ''
+    return new Error(`${error.message}${contextText}${causeText}`)
+  }
+
+  return new Error('Erro ao chamar função de usuários')
+}
 
 const callManageAuthUsers = async <T>(
   action: ManageAuthUsersAction,
   payload?: Record<string, unknown>,
 ): Promise<T> => {
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-
-  if (sessionError) {
-    throw new Error(sessionError.message || 'Erro ao obter sessão do usuário')
-  }
-
-  const token = sessionData.session?.access_token
-
-  if (!token) {
-    throw new Error('Sessão inválida para executar operação de usuários')
-  }
-
   const { data, error } = await supabase.functions.invoke('manage-auth-users', {
     body: { action, ...payload },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   })
 
   if (error) {
-    throw new Error(error.message || 'Erro ao chamar função de usuários')
+    throw formatInvokeError(error)
   }
 
   return data as T
@@ -60,51 +56,43 @@ export interface UpdateManagedProfileInput {
 
 export const authUsersService = {
   listProfiles: async (): Promise<ManagedProfileUser[]> => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, name, email, role, status, created_at')
-      .order('created_at', { ascending: false })
+    const response = await callManageAuthUsers<{ users?: ManagedProfileUser[] }>('list')
 
-    if (error) throw error
-
-    return (data ?? []) as ManagedProfileUser[]
+    return response.users ?? []
   },
 
-  create: async (input: CreateManagedAuthUserInput) => {
-    return callManageAuthUsers<{ success: boolean; userId: string }>('create', {
+  create: async (input: CreateManagedAuthUserInput): Promise<ManagedProfileUser> => {
+    const response = await callManageAuthUsers<{ user: ManagedProfileUser }>('create', {
       name: input.name.trim(),
       email: input.email.trim().toLowerCase(),
       role: input.role,
       status: input.status ?? 'Ativo',
     })
+
+    return response.user
   },
 
   updateProfile: async (input: UpdateManagedProfileInput): Promise<void> => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        name: input.name.trim(),
-        role: input.role,
-        status: input.status,
-      })
-      .eq('id', input.id)
-
-    if (error) {
-      throw error
-    }
+    await callManageAuthUsers<{ user: ManagedProfileUser }>('update', {
+      id: input.id,
+      name: input.name.trim(),
+      email: input.email.trim().toLowerCase(),
+      role: input.role,
+      status: input.status,
+    })
   },
 
-  resetPassword: async (input: { email: string }): Promise<boolean> => {
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      input.email.trim().toLowerCase(),
-      {
-        redirectTo: `${window.location.origin}/reset-password`,
-      },
-    )
+  resetPassword: async (input: { email?: string | null }): Promise<boolean> => {
+    const normalizedEmail = String(input.email || '').trim().toLowerCase()
 
-    if (error) {
-      throw new Error(error.message || 'Erro ao enviar redefinição de senha')
+    if (!normalizedEmail) {
+      throw new Error('Usuário sem e-mail válido para redefinição de senha')
     }
+
+    await callManageAuthUsers<{ success: boolean }>('reset_password', {
+      email: normalizedEmail,
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
 
     return true
   },

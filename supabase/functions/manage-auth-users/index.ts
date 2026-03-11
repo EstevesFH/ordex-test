@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type User } from '@supabase/supabase-js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,7 +16,7 @@ type Profile = {
   status: Status | null
 }
 
-const mapUser = (user: any, profile?: Profile) => ({
+const mapUser = (user: User, profile?: Profile) => ({
   id: user.id,
   email: profile?.email || user.email || '',
   name: profile?.name || user.user_metadata?.name || user.email || 'Usuário',

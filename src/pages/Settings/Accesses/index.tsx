@@ -12,7 +12,7 @@ import { AccessesModal } from './AccessesModal'
 export interface Accesses {
   id: string
   name: string
-  email: string
+  email: string | null
   role: string
   status: 'Ativo' | 'Inativo'
   created_at?: string
@@ -75,7 +75,7 @@ const AccessesSettings = () => {
     setModalMode(null)
   }
 
-  const handleResetPassword = async (email: string) => {
+  const handleResetPassword = async (email?: string | null) => {
     try {
       const ok = await authUsersService.resetPassword({ email })
 
@@ -84,7 +84,7 @@ const AccessesSettings = () => {
         return
       }
 
-      alert(`E-mail de redefinição enviado para ${email}`)
+      alert(`E-mail de redefinição enviado para ${String(email || '').trim()}`)
     } catch (error) {
       console.error(error)
       const message = error instanceof Error ? error.message : 'Erro ao enviar e-mail de redefinição de senha'
@@ -99,7 +99,7 @@ const AccessesSettings = () => {
       const matchSearch =
         !term ||
         a.name.toLowerCase().includes(term) ||
-        a.email.toLowerCase().includes(term)
+        String(a.email || '').toLowerCase().includes(term)
 
       const matchRole = filterRole ? a.role === filterRole : true
       const matchStatus = filterStatus ? a.status === filterStatus : true
@@ -207,7 +207,7 @@ const AccessesSettings = () => {
                     <tr key={accessesItem.id}>
                       <td>{accessesItem.id.slice(0, 8)}...</td>
                       <td>{accessesItem.name}</td>
-                      <td>{accessesItem.email}</td>
+                      <td>{accessesItem.email || '—'}</td>
                       <td>{accessesItem.role}</td>
                       <td>
                         <S.Status status={accessesItem.status}>
