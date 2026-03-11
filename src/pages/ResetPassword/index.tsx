@@ -21,16 +21,46 @@ const ResetPassword: React.FC = () => {
   const isStrongPassword = hasMinLength && hasUppercase && hasNumber && hasSpecial
 
   useEffect(() => {
-    // Verificar se há um token de recuperação na URL
+    // Verificar se há um token/código de recuperação na URL
     checkRecoveryToken()
   }, [])
 
   const checkRecoveryToken = async () => {
-    const { data } = await supabase.auth.getSession()
-    
-    if (data.session) {
-      setValidToken(true)
-    } else {
+    try {
+      const url = new URL(window.location.href)
+
+      // Fluxo PKCE: ?code=...
+      const recoveryCode = url.searchParams.get('code')
+      if (recoveryCode) {
+        const { error } = await supabase.auth.exchangeCodeForSession(recoveryCode)
+        if (error) throw error
+      }
+
+      // Fluxo implícito: #access_token=...&refresh_token=...
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
+
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        })
+
+        if (error) throw error
+      }
+
+      const { data } = await supabase.auth.getSession()
+
+      if (data.session) {
+        setValidToken(true)
+        return
+      }
+
+      setValidToken(false)
+      setError('Link de recuperação inválido ou expirado')
+    } catch (err) {
+      console.error('Erro ao validar token de recuperação:', err)
       setValidToken(false)
       setError('Link de recuperação inválido ou expirado')
     }
