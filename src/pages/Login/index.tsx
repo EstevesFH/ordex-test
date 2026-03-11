@@ -8,6 +8,20 @@ import * as S from './styles'
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000
 
+type StoredUser = {
+  id: string
+  username: string | null
+  name: string
+  role: AppRole
+  lastActive: number
+}
+
+type ProfileData = {
+  name: string | null
+  role: string | null
+  status?: string | null
+}
+
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,15 +39,23 @@ const Login = () => {
         if (!authUser) return
 
         const savedUser = localStorage.getItem('user')
-        const parsedUser = savedUser ? JSON.parse(savedUser) : null
+        let parsedUser: StoredUser | null = null
+
+        if (savedUser) {
+          try {
+            parsedUser = JSON.parse(savedUser) as StoredUser
+          } catch {
+            localStorage.removeItem('user')
+          }
+        }
+
         const currentTime = Date.now()
 
         if (
-          parsedUser &&
-          parsedUser.id === authUser.id &&
-          currentTime - (parsedUser.lastActive || currentTime) < FIFTEEN_MINUTES
+          parsedUser?.id === authUser.id &&
+          currentTime - parsedUser.lastActive < FIFTEEN_MINUTES
         ) {
-          navigate(getLandingByRole(parsedUser.role as AppRole), { replace: true })
+          navigate(getLandingByRole(parsedUser.role), { replace: true })
           return
         }
 
@@ -41,17 +63,17 @@ const Login = () => {
           .from('profiles')
           .select('name, role, status')
           .eq('id', authUser.id)
-          .maybeSingle()
+          .maybeSingle<ProfileData>()
 
         if (profileError) {
           console.error('Erro ao buscar perfil:', profileError)
           return
         }
 
-        const role = ((profileData?.role as string) || 'Operador') as AppRole
-        const status = ((profileData?.status as string) || 'Ativo').toLowerCase()
+        const role = (profileData?.role || 'Operador') as AppRole
+        const status = (profileData?.status || 'Ativo').toLowerCase()
         const displayName =
-          (profileData?.name as string) ||
+          profileData?.name ||
           (authUser.user_metadata?.name as string) ||
           authUser.email?.split('@')[0] ||
           'Usuário'
@@ -66,11 +88,11 @@ const Login = () => {
           'user',
           JSON.stringify({
             id: authUser.id,
-            username: authUser.email,
+            username: authUser.email ?? null,
             name: displayName,
             role,
             lastActive: Date.now(),
-          }),
+          } satisfies StoredUser),
         )
 
         navigate(getLandingByRole(role), { replace: true })
@@ -82,7 +104,7 @@ const Login = () => {
     restoreSession()
   }, [navigate])
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -104,7 +126,7 @@ const Login = () => {
         .from('profiles')
         .select('name, role, status')
         .eq('id', currentUser.id)
-        .maybeSingle()
+        .maybeSingle<ProfileData>()
 
       if (profileError) {
         console.error('Erro ao buscar perfil:', profileError)
@@ -112,10 +134,10 @@ const Login = () => {
         return
       }
 
-      const role = ((profileData?.role as string) || 'Operador') as AppRole
-      const status = ((profileData?.status as string) || 'Ativo').toLowerCase()
+      const role = (profileData?.role || 'Operador') as AppRole
+      const status = (profileData?.status || 'Ativo').toLowerCase()
       const displayName =
-        (profileData?.name as string) ||
+        profileData?.name ||
         (currentUser.user_metadata?.name as string) ||
         currentUser.email?.split('@')[0] ||
         'Usuário'
@@ -130,11 +152,11 @@ const Login = () => {
         'user',
         JSON.stringify({
           id: currentUser.id,
-          username: currentUser.email,
+          username: currentUser.email ?? null,
           name: displayName,
           role,
           lastActive: Date.now(),
-        }),
+        } satisfies StoredUser),
       )
 
       navigate(getLandingByRole(role), { replace: true })
