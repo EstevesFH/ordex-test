@@ -172,6 +172,14 @@ const Login = () => {
     <S.Container>
       <S.LoginCard>
         <S.LogoWrapper>
+          <img
+            src="/logo.svg"
+            alt="ORDEX Logo"
+            width={120}
+            style={{
+              filter: "brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1350%) hue-rotate(220deg)"
+            }}
+          />
           <div className="icon-box">
             <FiLock size={30} />
           </div>
@@ -187,7 +195,7 @@ const Login = () => {
               <input
                 id="login-email"
                 type="email"
-                value={email}
+                value={email} 
                 onChange={e => setEmail(e.target.value)}
                 placeholder="nome@empresa.com"
                 required
