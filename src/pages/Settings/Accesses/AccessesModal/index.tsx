@@ -28,7 +28,7 @@ const AccessesModal = ({
   useEffect(() => {
     if (isEdit && accesses) {
       setName(accesses.name)
-      setEmail(accesses.email)
+      setEmail(accesses.email || '')
       setRole(accesses.role)
       setStatus(accesses.status)
       return
