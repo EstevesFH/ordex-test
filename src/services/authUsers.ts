@@ -15,7 +15,7 @@ const formatInvokeError = (error: unknown): Error => {
   return new Error('Erro ao chamar função de usuários')
 }
 
-const callManageAuthUsers = async <T>(
+const invokeManageAuthUsersFallback = async <T>(
   action: ManageAuthUsersAction,
   payload?: Record<string, unknown>,
 ): Promise<T> => {
@@ -36,10 +36,31 @@ const callManageAuthUsers = async <T>(
   throw parsedError
 }
 
+const callManageAuthUsers = async <T>(
+  action: ManageAuthUsersAction,
+  payload?: Record<string, unknown>,
+): Promise<T> => {
+  const { data, error } = await supabase.functions.invoke('manage-auth-users', {
+    body: { action, ...payload },
+  })
+
+  if (!error) {
+    return data as T
+  }
+
+  const parsedError = formatInvokeError(error)
+
+  if (parsedError.message.includes('Failed to send a request to the Edge Function')) {
+    return invokeManageAuthUsersFallback<T>(action, payload)
+  }
+
+  throw parsedError
+}
+
 export interface ManagedProfileUser {
   id: string
   name: string
-  email: string
+  email: string | null
   role: string
   status: UserStatus
   created_at?: string
@@ -104,9 +125,5 @@ export const authUsersService = {
 
     return true
   },
-}
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function invokeManageAuthUsersFallback<T>(_action: string, _payload: Record<string, unknown> | undefined): T | PromiseLike<T> {
-  throw new Error('Function not implemented.')
 }
 
