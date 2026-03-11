@@ -82,15 +82,17 @@ export const authUsersService = {
     })
   },
 
-  resetPassword: async (input: { email?: string | null }): Promise<boolean> => {
+  resetPassword: async (input: { id?: string; email?: string | null }): Promise<boolean> => {
+    const normalizedId = String(input.id || '').trim()
     const normalizedEmail = String(input.email || '').trim().toLowerCase()
 
-    if (!normalizedEmail) {
-      throw new Error('Usuário sem e-mail válido para redefinição de senha')
+    if (!normalizedId && !normalizedEmail) {
+      throw new Error('Usuário sem identificador para redefinição de senha')
     }
 
-    await callManageAuthUsers<{ success: boolean }>('reset_password', {
-      email: normalizedEmail,
+    await callManageAuthUsers<{ success: boolean; email?: string }>('reset_password', {
+      id: normalizedId || undefined,
+      email: normalizedEmail || undefined,
       redirectTo: `${window.location.origin}/reset-password`,
     })
 

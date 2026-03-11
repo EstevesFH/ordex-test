@@ -47,6 +47,30 @@ const upsertProfile = async (
   if (error) throw error
 }
 
+const resolveResetTargetEmail = async (
+  admin: ReturnType<typeof createClient>,
+  input: { id?: string; email?: string },
+) => {
+  const userId = String(input.id || '').trim()
+  const normalizedEmail = String(input.email || '').trim().toLowerCase()
+
+  if (userId) {
+    const { data, error } = await admin.auth.admin.getUserById(userId)
+    if (error) throw error
+
+    const userEmail = String(data.user?.email || '').trim().toLowerCase()
+    if (!userEmail) throw new Error('Usuário não possui e-mail válido para redefinição')
+
+    return userEmail
+  }
+
+  if (!normalizedEmail) {
+    throw new Error('Campo obrigatório: email')
+  }
+
+  return normalizedEmail
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -184,12 +208,11 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'reset_password') {
-      const email = String(body.email || '').trim().toLowerCase()
       const redirectTo = String(body.redirectTo || '').trim()
-
-      if (!email) {
-        return jsonResponse({ error: 'Campo obrigatório: email' }, 400)
-      }
+      const email = await resolveResetTargetEmail(admin, {
+        id: String(body.id || ''),
+        email: String(body.email || ''),
+      })
 
       const fallbackRedirect = `${Deno.env.get('SITE_URL') || 'http://localhost:5173'}/reset-password`
       const preferredRedirect = redirectTo || fallbackRedirect
@@ -214,7 +237,7 @@ Deno.serve(async (req) => {
 
       if (resetError) throw resetError
 
-      return jsonResponse({ success: true })
+      return jsonResponse({ success: true, email })
     }
 
     return jsonResponse({ error: 'Ação inválida' }, 400)

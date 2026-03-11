@@ -75,16 +75,19 @@ const AccessesSettings = () => {
     setModalMode(null)
   }
 
-  const handleResetPassword = async (email?: string | null) => {
+  const handleResetPassword = async (accessesItem: Accesses) => {
     try {
-      const ok = await authUsersService.resetPassword({ email })
+      const ok = await authUsersService.resetPassword({
+        id: accessesItem.id,
+        email: accessesItem.email,
+      })
 
       if (!ok) {
         alert('Não foi possível enviar o e-mail de redefinição')
         return
       }
 
-      alert(`E-mail de redefinição enviado para ${String(email || '').trim()}`)
+      alert(`E-mail de redefinição enviado para ${String(accessesItem.email || '').trim()}`)
     } catch (error) {
       console.error(error)
       const message = error instanceof Error ? error.message : 'Erro ao enviar e-mail de redefinição de senha'
@@ -222,7 +225,7 @@ const AccessesSettings = () => {
 
                           <button
                             title="Redefinir senha"
-                            onClick={() => handleResetPassword(accessesItem.email)}
+                            onClick={() => handleResetPassword(accessesItem)}
                           >
                             <FiKey />
                           </button>
