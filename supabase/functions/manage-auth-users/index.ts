@@ -105,62 +105,44 @@ Deno.serve(async (req) => {
 
     if (action === 'create') {
       const { name, email, role } = body as { name: string; email: string; role: Role }
+      const normalizedEmail = String(email || '').trim().toLowerCase()
+      const normalizedName = String(name || '').trim()
       const userRole = role || 'Operador'
-      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-        data: { name },
-      })
 
-      if (error) throw error
-
-      if (data.user) {
-        await admin.auth.admin.updateUserById(data.user.id, {
-          app_metadata: {
-            ...(data.user.app_metadata || {}),
-            role: userRole,
-            status: 'Ativo',
-          },
-          user_metadata: {
-            ...(data.user.user_metadata || {}),
-            name,
-          },
-        })
-
-        await upsertProfile(admin, {
-          id: data.user.id,
-          name,
-          email,
-          role: userRole,
-          status: 'Ativo',
-        })
+      if (!normalizedName || !normalizedEmail) {
+        return jsonResponse({ error: 'Campos obrigatórios: name e email' }, 400)
       }
 
-      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { name } })
-      if (error) throw error
-      if (!data.user) throw new Error('Usuário não retornado na criação')
+      const { data: invitedData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
+        data: { name: normalizedName },
+      })
 
-      const { data: updatedData, error: updateError } = await admin.auth.admin.updateUserById(data.user.id, {
+      if (inviteError) throw inviteError
+      if (!invitedData.user) throw new Error('Usuário não retornado na criação')
+
+      const { data: updatedData, error: updateError } = await admin.auth.admin.updateUserById(invitedData.user.id, {
         app_metadata: {
-          ...(data.user.app_metadata || {}),
-          role,
+          ...(invitedData.user.app_metadata || {}),
+          role: userRole,
           status: 'Ativo',
         },
         user_metadata: {
-          ...(data.user.user_metadata || {}),
-          name,
+          ...(invitedData.user.user_metadata || {}),
+          name: normalizedName,
         },
       })
 
       if (updateError) throw updateError
 
       await upsertProfile(admin, {
-        id: data.user.id,
-        name,
-        email,
-        role,
+        id: invitedData.user.id,
+        name: normalizedName,
+        email: normalizedEmail,
+        role: userRole,
         status: 'Ativo',
       })
 
-      return jsonResponse({ user: mapUser(updatedData.user || data.user) })
+      return jsonResponse({ user: mapUser(updatedData.user || invitedData.user) })
     }
 
     if (action === 'update') {
@@ -198,24 +180,39 @@ Deno.serve(async (req) => {
         status,
       })
 
-      return new Response(JSON.stringify({ user: mapUser(data.user) }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-
       return jsonResponse({ user: mapUser(data.user, { id, name, email, role, status }) })
     }
 
     if (action === 'reset_password') {
-      const email = String(body.email || '').trim()
+      const email = String(body.email || '').trim().toLowerCase()
+      const redirectTo = String(body.redirectTo || '').trim()
+
       if (!email) {
         return jsonResponse({ error: 'Campo obrigatório: email' }, 400)
       }
 
-      const { error } = await admin.auth.resetPasswordForEmail(email, {
-        redirectTo: `${Deno.env.get('SITE_URL') || 'http://localhost:5173'}/reset-password`,
+      const fallbackRedirect = `${Deno.env.get('SITE_URL') || 'http://localhost:5173'}/reset-password`
+      const preferredRedirect = redirectTo || fallbackRedirect
+
+      let resetError: Error | null = null
+
+      const firstAttempt = await admin.auth.resetPasswordForEmail(email, {
+        redirectTo: preferredRedirect,
       })
-      if (error) throw error
+
+      if (firstAttempt.error) {
+        resetError = firstAttempt.error
+
+        // fallback para ambientes onde redirectTo não está liberado na allowlist do projeto
+        const secondAttempt = await admin.auth.resetPasswordForEmail(email)
+        if (secondAttempt.error) {
+          resetError = secondAttempt.error
+        } else {
+          resetError = null
+        }
+      }
+
+      if (resetError) throw resetError
 
       return jsonResponse({ success: true })
     }

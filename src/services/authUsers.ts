@@ -108,6 +108,7 @@ export const authUsersService = {
   resetPassword: async (input: { email: string }): Promise<boolean> => {
     const result = await callManageAuthUsers<{ success?: boolean }>('reset_password', {
       email: input.email.trim().toLowerCase(),
+      redirectTo: `${window.location.origin}/reset-password`,
     })
 
     return Boolean(result.success)
