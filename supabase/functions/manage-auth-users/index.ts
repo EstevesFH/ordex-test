@@ -63,21 +63,15 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceRole)
     const authHeader = req.headers.get('Authorization')
 
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Token ausente' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    if (!authHeader?.startsWith('Bearer ')) {
+      return jsonResponse({ error: 'Token ausente' }, 401)
     }
 
     const token = authHeader.replace('Bearer ', '')
     const { data: requesterData, error: requesterError } = await admin.auth.getUser(token)
 
     if (requesterError || !requesterData.user) {
-      return new Response(JSON.stringify({ error: 'Token inválido' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ error: 'Token inválido' }, 401)
     }
 
     const { data: requesterProfile } = await admin
@@ -94,8 +88,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    const body = await req.json()
-    const action = body.action as string
+    const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
+    const action = String(body.action || '')
 
     if (action === 'list') {
       const { data, error } = await admin.auth.admin.listUsers()
@@ -140,10 +134,33 @@ Deno.serve(async (req) => {
         })
       }
 
-      return new Response(JSON.stringify({ user: mapUser(data.user) }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { name } })
+      if (error) throw error
+      if (!data.user) throw new Error('Usuário não retornado na criação')
+
+      const { data: updatedData, error: updateError } = await admin.auth.admin.updateUserById(data.user.id, {
+        app_metadata: {
+          ...(data.user.app_metadata || {}),
+          role,
+          status: 'Ativo',
+        },
+        user_metadata: {
+          ...(data.user.user_metadata || {}),
+          name,
+        },
       })
+
+      if (updateError) throw updateError
+
+      await upsertProfile(admin, {
+        id: data.user.id,
+        name,
+        email,
+        role,
+        status: 'Ativo',
+      })
+
+      return jsonResponse({ user: mapUser(updatedData.user || data.user) })
     }
 
     if (action === 'update') {
@@ -155,13 +172,18 @@ Deno.serve(async (req) => {
         status: Status
       }
 
+      const { data: existingUserData, error: existingUserError } = await admin.auth.admin.getUserById(id)
+      if (existingUserError) throw existingUserError
+
       const { data, error } = await admin.auth.admin.updateUserById(id, {
         email,
         app_metadata: {
-          role: role || 'Operador',
-          status: status || 'Ativo',
+          ...(existingUserData.user?.app_metadata || {}),
+          role,
+          status,
         },
         user_metadata: {
+          ...(existingUserData.user?.user_metadata || {}),
           name,
         },
       })
@@ -180,31 +202,27 @@ Deno.serve(async (req) => {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
+
+      return jsonResponse({ user: mapUser(data.user, { id, name, email, role, status }) })
     }
 
     if (action === 'reset_password') {
-      const { email } = body as { email: string }
+      const email = String(body.email || '').trim()
+      if (!email) {
+        return jsonResponse({ error: 'Campo obrigatório: email' }, 400)
+      }
+
       const { error } = await admin.auth.resetPasswordForEmail(email, {
         redirectTo: `${Deno.env.get('SITE_URL') || 'http://localhost:5173'}/reset-password`,
       })
-
       if (error) throw error
 
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ success: true })
     }
 
-    return new Response(JSON.stringify({ error: 'Ação inválida' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: 'Ação inválida' }, 400)
   } catch (error) {
     console.error(error)
-    return new Response(JSON.stringify({ error: (error as Error).message || 'Erro interno' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: (error as Error).message || 'Erro interno' }, 500)
   }
 })

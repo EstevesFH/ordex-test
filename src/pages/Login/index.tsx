@@ -15,16 +15,18 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (!userStr) return
+    const restoreSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const user = sessionData.session?.user
+      if (!user) return
 
-    const user = JSON.parse(userStr)
-    const now = Date.now()
-    const fifteenMinutes = 15 * 60 * 1000
+      const profileData = await getProfileData(user.id, user.email)
 
     if (now - (user.lastActive || now) < fifteenMinutes) {
       navigate(getLandingByRole(user.role), { replace: true })
     }
+
+    restoreSession()
   }, [navigate])
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -66,8 +68,8 @@ const Login = () => {
       localStorage.setItem(
         'user',
         JSON.stringify({
-          id: signInData.user.id,
-          username: signInData.user.email,
+          id: currentUser.id,
+          username: currentUser.email,
           name: displayName,
           role,
           lastActive: Date.now(),
