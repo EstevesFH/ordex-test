@@ -11,8 +11,14 @@ interface AccessesModalProps {
   onUpdated: () => void
 }
 
-const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProps) => {
+const AccessesModal = ({
+  accesses,
+  mode,
+  onClose,
+  onUpdated,
+}: AccessesModalProps) => {
   const isEdit = mode === 'edit'
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('Operador')
@@ -25,7 +31,13 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
       setEmail(accesses.email)
       setRole(accesses.role)
       setStatus(accesses.status)
+      return
     }
+
+    setName('')
+    setEmail('')
+    setRole('Operador')
+    setStatus('Ativo')
   }, [isEdit, accesses])
 
   const handleSave = async () => {
@@ -38,24 +50,32 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
 
     try {
       if (mode === 'create') {
-        await authUsersService.create({ name, email, role })
-        alert(`Usuário criado no Auth e e-mail enviado para definir senha: ${email}`)
+        await authUsersService.create({
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          role,
+          status: 'Ativo',
+        })
+
+        alert(`Usuário criado e e-mail enviado para definir senha: ${email}`)
       }
 
       if (mode === 'edit' && accesses) {
-        await authUsersService.update({
+        await authUsersService.updateProfile({
           id: accesses.id,
-          name,
-          email,
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
           role,
           status,
         })
+
+        alert('Usuário atualizado com sucesso')
       }
 
       onUpdated()
     } catch (error) {
       console.error(error)
-      alert('Erro ao salvar usuário no Auth')
+      alert('Erro ao salvar usuário')
     } finally {
       setSaving(false)
     }
@@ -64,21 +84,35 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
   return (
     <S.Overlay onClick={onClose}>
       <S.Modal onClick={e => e.stopPropagation()}>
-        <S.Title>{isEdit ? 'Editar Acesso (Auth)' : 'Novo Acesso (Auth)'}</S.Title>
+        <S.Title>{isEdit ? 'Editar Acesso' : 'Novo Acesso'}</S.Title>
 
         <S.Field>
           <label htmlFor="accesses-name">Nome</label>
-          <input id="accesses-name" value={name} onChange={e => setName(e.target.value)} />
+          <input
+            id="accesses-name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
         </S.Field>
 
         <S.Field>
           <label htmlFor="accesses-email">E-mail</label>
-          <input id="accesses-email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+          <input
+            id="accesses-email"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            disabled={isEdit}
+          />
         </S.Field>
 
         <S.Field>
           <label htmlFor="accesses-role">Função</label>
-          <select id="accesses-role" value={role} onChange={e => setRole(e.target.value)}>
+          <select
+            id="accesses-role"
+            value={role}
+            onChange={e => setRole(e.target.value)}
+          >
             <option value="Administrador">Administrador</option>
             <option value="Supervisor">Supervisor</option>
             <option value="Operador">Operador</option>
@@ -88,7 +122,11 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
         {isEdit && (
           <S.Field>
             <label htmlFor="accesses-status">Status</label>
-            <select id="accesses-status" value={status} onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}>
+            <select
+              id="accesses-status"
+              value={status}
+              onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}
+            >
               <option value="Ativo">Ativo</option>
               <option value="Inativo">Inativo</option>
             </select>
@@ -97,7 +135,12 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
 
         <S.Actions>
           <Button title="Cancelar" variant="tertiary" onClick={onClose} />
-          <Button title="Salvar" variant="primary" onClick={handleSave} disabled={saving} />
+          <Button
+            title={saving ? 'Salvando...' : 'Salvar'}
+            variant="primary"
+            onClick={handleSave}
+            disabled={saving}
+          />
         </S.Actions>
       </S.Modal>
     </S.Overlay>

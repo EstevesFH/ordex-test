@@ -33,12 +33,14 @@ const AccessesSettings = () => {
 
   const fetchAccesses = async () => {
     setLoading(true)
+
     try {
-      const users = await authUsersService.list()
+      const users = await authUsersService.listProfiles()
       setAccesses(users)
     } catch (error) {
       console.error(error)
-      alert('Erro ao carregar usuários do Auth')
+      alert('Erro ao carregar usuários')
+      setAccesses([])
     } finally {
       setLoading(false)
     }
@@ -48,10 +50,14 @@ const AccessesSettings = () => {
     fetchAccesses()
   }, [])
 
-  const roles = useMemo(() => Array.from(new Set(accesses.map(item => item.role))).filter(Boolean), [accesses])
+  const roles = useMemo(
+    () => Array.from(new Set(accesses.map(item => item.role))).filter(Boolean),
+    [accesses],
+  )
+
   const statusOptions = useMemo(
     () => Array.from(new Set(accesses.map(item => item.status))).filter(Boolean),
-    [accesses]
+    [accesses],
   )
 
   const openCreate = () => {
@@ -71,7 +77,13 @@ const AccessesSettings = () => {
 
   const handleResetPassword = async (email: string) => {
     try {
-      await authUsersService.resetPassword({ email })
+      const ok = await authUsersService.resetPassword({ email })
+
+      if (!ok) {
+        alert('Não foi possível enviar o e-mail de redefinição')
+        return
+      }
+
       alert(`E-mail de redefinição enviado para ${email}`)
     } catch (error) {
       console.error(error)
@@ -80,24 +92,61 @@ const AccessesSettings = () => {
   }
 
   const filteredAccesses = accesses
-    .filter(a =>
-      (a.name.toLowerCase().includes(search.toLowerCase()) || a.email.toLowerCase().includes(search.toLowerCase())) &&
-      (filterRole ? a.role === filterRole : true) &&
-      (filterStatus ? a.status === filterStatus : true)
-    )
+    .filter(a => {
+      const term = search.trim().toLowerCase()
+
+      const matchSearch =
+        !term ||
+        a.name.toLowerCase().includes(term) ||
+        a.email.toLowerCase().includes(term)
+
+      const matchRole = filterRole ? a.role === filterRole : true
+      const matchStatus = filterStatus ? a.status === filterStatus : true
+
+      return matchSearch && matchRole && matchStatus
+    })
     .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 
-  const paginatedAccesses = filteredAccesses.slice((page - 1) * itemsPerPage, page * itemsPerPage)
+  const paginatedAccesses = filteredAccesses.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage,
+  )
 
   const filterFields: FilterField[] = [
-    { label: 'Nome ou e-mail', type: 'text', value: search, onChange: setSearch },
-    { label: 'Função', type: 'select', value: filterRole, onChange: setFilterRole, options: [{ value: '', label: 'Todas' }, ...roles.map(role => ({ value: role, label: role }))] },
+    {
+      label: 'Nome ou e-mail',
+      type: 'text',
+      value: search,
+      onChange: value => {
+        setSearch(value)
+        setPage(1)
+      },
+    },
+    {
+      label: 'Função',
+      type: 'select',
+      value: filterRole,
+      onChange: value => {
+        setFilterRole(value)
+        setPage(1)
+      },
+      options: [
+        { value: '', label: 'Todas' },
+        ...roles.map(role => ({ value: role, label: role })),
+      ],
+    },
     {
       label: 'Status',
       type: 'select',
       value: filterStatus,
-      onChange: setFilterStatus,
-      options: [{ value: '', label: 'Todos' }, ...statusOptions.map(status => ({ value: status, label: status }))],
+      onChange: value => {
+        setFilterStatus(value)
+        setPage(1)
+      },
+      options: [
+        { value: '', label: 'Todos' },
+        ...statusOptions.map(status => ({ value: status, label: status })),
+      ],
     },
   ]
 
@@ -106,7 +155,8 @@ const AccessesSettings = () => {
   return (
     <S.Container>
       <S.Header>
-        <h1>Acessos (Auth)</h1>
+        <h1>Acessos</h1>
+
         <S.Controls>
           {(search || filterRole || filterStatus) && (
             <Button
@@ -121,7 +171,14 @@ const AccessesSettings = () => {
               }}
             />
           )}
-          <Button title="Filtrar" variant="secondary" size="small" onClick={() => setIsFilterOpen(true)} />
+
+          <Button
+            title="Filtrar"
+            variant="secondary"
+            size="small"
+            onClick={() => setIsFilterOpen(true)}
+          />
+
           <Button title="Novo Acesso" variant="primary" onClick={openCreate} />
         </S.Controls>
       </S.Header>
@@ -143,6 +200,7 @@ const AccessesSettings = () => {
                     <th>Ações</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {paginatedAccesses.map(accessesItem => (
                     <tr key={accessesItem.id}>
@@ -151,14 +209,20 @@ const AccessesSettings = () => {
                       <td>{accessesItem.email}</td>
                       <td>{accessesItem.role}</td>
                       <td>
-                        <S.Status status={accessesItem.status}>{accessesItem.status}</S.Status>
+                        <S.Status status={accessesItem.status}>
+                          {accessesItem.status}
+                        </S.Status>
                       </td>
                       <td>
                         <S.Actions>
                           <button title="Editar" onClick={() => openEdit(accessesItem)}>
                             <FiEdit />
                           </button>
-                          <button title="Redefinir senha" onClick={() => handleResetPassword(accessesItem.email)}>
+
+                          <button
+                            title="Redefinir senha"
+                            onClick={() => handleResetPassword(accessesItem.email)}
+                          >
                             <FiKey />
                           </button>
                         </S.Actions>
@@ -168,12 +232,30 @@ const AccessesSettings = () => {
                 </tbody>
               </table>
             </S.TableWrapper>
-            <Pagination totalItems={filteredAccesses.length} onPageChange={setPage} onItemsPerPageChange={setItemsPerPage} />
+
+            <Pagination
+              totalItems={filteredAccesses.length}
+              currentPage={page}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setPage}
+              onItemsPerPageChange={(count: number) => {
+                setItemsPerPage(count)
+                setPage(1)
+              }}
+            />
           </>
         )}
       </S.TableCard>
 
-      <Filter isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} fields={filterFields} onApply={() => { setPage(1); setIsFilterOpen(false) }} />
+      <Filter
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        fields={filterFields}
+        onApply={() => {
+          setPage(1)
+          setIsFilterOpen(false)
+        }}
+      />
 
       {modalMode && (
         <AccessesModal

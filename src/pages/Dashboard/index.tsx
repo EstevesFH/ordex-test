@@ -19,8 +19,12 @@ interface Ticket {
   prioridade: string
   produto: string
   descricao: string
-  status: string
+  status: 'Aberto' | 'Em Andamento' | 'Aguardando' | 'Finalizado'
   dataabertura: string
+  retorno?: string
+  datatermino?: string
+  asset_id?: number | string | null
+  service_type?: string | null
 }
 
 const Dashboard = () => {
@@ -31,8 +35,31 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
+      setLoading(true)
+
       try {
-        const { data, error } = await supabase.from('tickets').select('*')
+        const { data, error } = await supabase
+          .from('tickets')
+          .select(
+            `
+              id,
+              solicitante,
+              local,
+              prioridade,
+              produto,
+              descricao,
+              status,
+              dataabertura,
+              retorno,
+              datatermino,
+              asset_id,
+              service_type
+            `,
+          )
+          .order('id', { ascending: false })
+
+        console.log('tickets data:', data)
+        console.log('tickets error:', error)
 
         if (error) {
           console.error('Erro ao buscar tickets:', error)
@@ -66,9 +93,9 @@ const Dashboard = () => {
 
   const visibleTickets = useMemo(
     () =>
-      tickets
-        .filter(t => ['Aberto', 'Em Andamento', 'Aguardando'].includes(t.status))
-        .sort((a, b) => b.id - a.id),
+      tickets.filter(t =>
+        ['Aberto', 'Em Andamento', 'Aguardando'].includes(t.status),
+      ),
     [tickets],
   )
 
@@ -98,14 +125,17 @@ const Dashboard = () => {
           <span>Em Aberto</span>
           <strong>{statusCount.aberto}</strong>
         </StatusCard>
+
         <StatusCard>
           <span>Em Andamento</span>
           <strong>{statusCount.andamento}</strong>
         </StatusCard>
+
         <StatusCard>
           <span>Aguardando</span>
           <strong>{statusCount.aguardando}</strong>
         </StatusCard>
+
         <StatusCard>
           <span>Finalizadas</span>
           <strong>{statusCount.finalizado}</strong>
@@ -120,6 +150,7 @@ const Dashboard = () => {
 
       <TableCard>
         <h2>Chamados em aberto / andamento</h2>
+
         <TableWrapper>
           <table>
             <thead>
@@ -132,19 +163,26 @@ const Dashboard = () => {
                 <th>Status</th>
               </tr>
             </thead>
+
             <tbody>
-              {paginatedTickets.map(ticket => (
-                <tr key={ticket.id}>
-                  <td>{ticket.id}</td>
-                  <td>{ticket.solicitante}</td>
-                  <td>{ticket.local}</td>
-                  <td>{ticket.produto}</td>
-                  <td>{ticket.prioridade}</td>
-                  <td>
-                    <Badge status={ticket.status}>{ticket.status}</Badge>
-                  </td>
+              {paginatedTickets.length > 0 ? (
+                paginatedTickets.map(ticket => (
+                  <tr key={ticket.id}>
+                    <td>{ticket.id}</td>
+                    <td>{ticket.solicitante}</td>
+                    <td>{ticket.local}</td>
+                    <td>{ticket.produto}</td>
+                    <td>{ticket.prioridade}</td>
+                    <td>
+                      <Badge status={ticket.status}>{ticket.status}</Badge>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6}>Nenhum chamado encontrado.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </TableWrapper>

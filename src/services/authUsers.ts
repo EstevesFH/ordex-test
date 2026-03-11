@@ -1,12 +1,24 @@
 import { supabase } from './supabase'
 
+type UserStatus = 'Ativo' | 'Inativo'
+
 const getFunctionsBaseUrl = () => {
   const url = import.meta.env.VITE_SUPABASE_URL as string
   return `${url}/functions/v1/manage-auth-users`
 }
 
-const callManageAuthUsers = async <T>(action: string, payload?: Record<string, unknown>) => {
-  const { data: sessionData } = await supabase.auth.getSession()
+type ManageAuthUsersAction = 'create' | 'reset_password'
+
+const callManageAuthUsers = async <T>(
+  action: ManageAuthUsersAction,
+  payload?: Record<string, unknown>,
+): Promise<T> => {
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+  if (sessionError) {
+    throw new Error(sessionError.message || 'Erro ao obter sessão do usuário')
+  }
+
   const token = sessionData.session?.access_token
 
   if (!token) {
@@ -31,31 +43,73 @@ const callManageAuthUsers = async <T>(action: string, payload?: Record<string, u
   return json as T
 }
 
-export interface ManagedAuthUser {
+export interface ManagedProfileUser {
   id: string
-  email: string
   name: string
+  email: string
   role: string
-  status: 'Ativo' | 'Inativo'
-  created_at: string
-  last_sign_in_at: string | null
+  status: UserStatus
+  created_at?: string
+}
+
+export interface CreateManagedAuthUserInput {
+  name: string
+  email: string
+  role: string
+  status?: UserStatus
+}
+
+export interface UpdateManagedProfileInput {
+  id: string
+  name: string
+  email: string
+  role: string
+  status: UserStatus
 }
 
 export const authUsersService = {
-  list: async () => {
-    const result = await callManageAuthUsers<{ users: ManagedAuthUser[] }>('list')
-    return result.users
+  listProfiles: async (): Promise<ManagedProfileUser[]> => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, name, email, role, status, created_at')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw error
+    }
+
+    return (data ?? []) as ManagedProfileUser[]
   },
 
-  create: async (input: { name: string; email: string; role: string }) => {
-    return callManageAuthUsers<{ user: ManagedAuthUser }>('create', input)
+  create: async (input: CreateManagedAuthUserInput) => {
+    return callManageAuthUsers<{ success: boolean; userId: string }>('create', {
+      ...input,
+      email: input.email.trim().toLowerCase(),
+      status: input.status ?? 'Ativo',
+    })
   },
 
-  update: async (input: { id: string; name: string; email: string; role: string; status: 'Ativo' | 'Inativo' }) => {
-    return callManageAuthUsers<{ user: ManagedAuthUser }>('update', input)
+  updateProfile: async (input: UpdateManagedProfileInput): Promise<void> => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        name: input.name,
+        email: input.email.trim().toLowerCase(),
+        role: input.role,
+        status: input.status,
+      })
+      .eq('id', input.id)
+
+    if (error) {
+      throw error
+    }
   },
 
-  resetPassword: async (input: { email: string }) => {
-    return callManageAuthUsers<{ success: boolean }>('reset_password', input)
+  resetPassword: async (input: { email: string }): Promise<boolean> => {
+    const result = await callManageAuthUsers<{ success?: boolean }>('reset_password', {
+      email: input.email.trim().toLowerCase(),
+    })
+
+    return Boolean(result.success)
   },
 }
