@@ -6,18 +6,63 @@ const corsHeaders = {
 }
 
 type Status = 'Ativo' | 'Inativo'
+type Role = 'Administrador' | 'Supervisor' | 'Operador'
 
-const mapUser = (user: any) => ({
+type Profile = {
+  id: string
+  email: string | null
+  name: string | null
+  role: string | null
+  status: string | null
+}
+
+const normalizeRole = (value?: string | null): Role => {
+  const normalized = value?.trim().toLowerCase()
+  if (normalized === 'administrador' || normalized === 'admin') return 'Administrador'
+  if (normalized === 'supervisor') return 'Supervisor'
+  return 'Operador'
+}
+
+const normalizeStatus = (value?: string | null): Status => {
+  const normalized = value?.trim().toLowerCase()
+  return normalized === 'inativo' ? 'Inativo' : 'Ativo'
+}
+
+const mapUser = (user: any, profile?: Profile) => ({
   id: user.id,
-  email: user.email || '',
-  name: user.user_metadata?.name || user.email || 'Usuário',
-  role: user.app_metadata?.role || 'Operador',
-  status: (user.app_metadata?.status || 'Ativo') as Status,
+  email: profile?.email || user.email || '',
+  name: profile?.name || user.user_metadata?.name || user.email || 'Usuário',
+  role: normalizeRole(profile?.role || user.app_metadata?.role),
+  status: normalizeStatus(profile?.status || user.app_metadata?.status),
   created_at: user.created_at,
   last_sign_in_at: user.last_sign_in_at,
 })
 
-Deno.serve(async (req) => {
+const fetchProfilesMap = async (admin: ReturnType<typeof createClient>, ids: string[]) => {
+  if (ids.length === 0) return new Map<string, Profile>()
+
+  const { data, error } = await admin.from('profiles').select('id, email, name, role, status').in('id', ids)
+
+  if (error) throw error
+
+  return new Map((data || []).map(profile => [profile.id as string, profile as Profile]))
+}
+
+const upsertProfile = async (
+  admin: ReturnType<typeof createClient>,
+  profile: { id: string; name: string; email: string; role: Role; status: Status }
+) => {
+  const { error } = await admin.from('profiles').upsert(profile, { onConflict: 'id' })
+  if (error) throw error
+}
+
+const jsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+
+Deno.serve(async req => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -33,123 +78,124 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceRole)
     const authHeader = req.headers.get('Authorization')
 
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Token ausente' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    if (!authHeader?.startsWith('Bearer ')) {
+      return jsonResponse({ error: 'Token ausente' }, 401)
     }
 
     const token = authHeader.replace('Bearer ', '')
     const { data: requesterData, error: requesterError } = await admin.auth.getUser(token)
 
     if (requesterError || !requesterData.user) {
-      return new Response(JSON.stringify({ error: 'Token inválido' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ error: 'Token inválido' }, 401)
     }
 
-    const requesterRole = requesterData.user.app_metadata?.role
-    if (requesterRole !== 'Administrador') {
-      return new Response(JSON.stringify({ error: 'Sem permissão para gerenciar usuários' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
 
-    const body = await req.json()
-    const action = body.action as string
+    const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
+    const action = String(body.action || '')
 
     if (action === 'list') {
       const { data, error } = await admin.auth.admin.listUsers()
       if (error) throw error
 
-      return new Response(JSON.stringify({ users: data.users.map(mapUser) }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      const profilesMap = await fetchProfilesMap(admin, data.users.map(user => user.id))
+      return jsonResponse({ users: data.users.map(user => mapUser(user, profilesMap.get(user.id))) })
     }
 
     if (action === 'create') {
-      const { name, email, role } = body as { name: string; email: string; role: string }
-      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-        data: { name },
-      })
+      const name = String(body.name || '').trim()
+      const email = String(body.email || '').trim()
+      const role = normalizeRole(String(body.role || 'Operador'))
 
-      if (error) throw error
-
-      if (data.user) {
-        await admin.auth.admin.updateUserById(data.user.id, {
-          app_metadata: {
-            ...(data.user.app_metadata || {}),
-            role: role || 'Operador',
-            status: 'Ativo',
-          },
-          user_metadata: {
-            ...(data.user.user_metadata || {}),
-            name,
-          },
-        })
+      if (!name || !email) {
+        return jsonResponse({ error: 'Campos obrigatórios: name e email' }, 400)
       }
 
-      return new Response(JSON.stringify({ user: mapUser(data.user) }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { name } })
+      if (error) throw error
+      if (!data.user) throw new Error('Usuário não retornado na criação')
+
+      const { data: updatedData, error: updateError } = await admin.auth.admin.updateUserById(data.user.id, {
+        app_metadata: {
+          ...(data.user.app_metadata || {}),
+          role,
+          status: 'Ativo',
+        },
+        user_metadata: {
+          ...(data.user.user_metadata || {}),
+          name,
+        },
       })
+
+      if (updateError) throw updateError
+
+      await upsertProfile(admin, {
+        id: data.user.id,
+        name,
+        email,
+        role,
+        status: 'Ativo',
+      })
+
+      return jsonResponse({ user: mapUser(updatedData.user || data.user) })
     }
 
     if (action === 'update') {
-      const { id, name, email, role, status } = body as {
-        id: string
-        name: string
-        email: string
-        role: string
-        status: Status
+      const id = String(body.id || '').trim()
+      const name = String(body.name || '').trim()
+      const email = String(body.email || '').trim()
+      const role = normalizeRole(String(body.role || 'Operador'))
+      const status = normalizeStatus(String(body.status || 'Ativo'))
+
+      if (!id || !name || !email) {
+        return jsonResponse({ error: 'Campos obrigatórios: id, name e email' }, 400)
       }
+
+      const { data: existingUserData, error: existingUserError } = await admin.auth.admin.getUserById(id)
+      if (existingUserError) throw existingUserError
 
       const { data, error } = await admin.auth.admin.updateUserById(id, {
         email,
         app_metadata: {
-          role: role || 'Operador',
-          status: status || 'Ativo',
+          ...(existingUserData.user?.app_metadata || {}),
+          role,
+          status,
         },
         user_metadata: {
+          ...(existingUserData.user?.user_metadata || {}),
           name,
         },
       })
 
       if (error) throw error
 
-      return new Response(JSON.stringify({ user: mapUser(data.user) }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      await upsertProfile(admin, {
+        id,
+        name,
+        email,
+        role,
+        status,
       })
+
+      return jsonResponse({ user: mapUser(data.user, { id, name, email, role, status }) })
     }
 
     if (action === 'reset_password') {
-      const { email } = body as { email: string }
+      const email = String(body.email || '').trim()
+      if (!email) {
+        return jsonResponse({ error: 'Campo obrigatório: email' }, 400)
+      }
+
       const { error } = await admin.auth.resetPasswordForEmail(email, {
         redirectTo: `${Deno.env.get('SITE_URL') || 'http://localhost:5173'}/reset-password`,
       })
-
       if (error) throw error
 
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ success: true })
     }
 
-    return new Response(JSON.stringify({ error: 'Ação inválida' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: 'Ação inválida' }, 400)
   } catch (error) {
     console.error(error)
-    return new Response(JSON.stringify({ error: (error as Error).message || 'Erro interno' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: (error as Error).message || 'Erro interno' }, 500)
   }
 })

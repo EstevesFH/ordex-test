@@ -80,6 +80,7 @@ const AccessesModal = ({ accesses, mode, onClose, onUpdated }: AccessesModalProp
           <label>Função</label>
           <select value={role} onChange={e => setRole(e.target.value)}>
             <option value="Administrador">Administrador</option>
+            <option value="Supervisor">Supervisor</option>
             <option value="Operador">Operador</option>
           </select>
         </S.Field>

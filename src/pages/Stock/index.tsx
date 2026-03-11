@@ -27,7 +27,6 @@ const Stock: React.FC = () => {
 
   const [selectedItem, setSelectedItem] = useState<StockItem | null>(null)
   const [mode, setMode] = useState<'view' | 'edit' | 'create' | 'movement' | 'history'>('view')
-
   useEffect(() => {
     fetchStockItems()
   }, [fetchStockItems])

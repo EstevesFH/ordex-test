@@ -13,30 +13,7 @@ import { Login } from './pages/Login'
 import { RegisterOS } from './pages/RegisterOS'
 import { ResetPassword } from './pages/ResetPassword'
 import { designSystem } from './styles/designSystem'
-
-type AppRole = 'Administrador' | 'Operador'
-
-interface SessionUser {
-  id: number
-  username: string
-  name: string
-  role: AppRole | string
-  lastActive: number
-}
-
-const getSessionUser = (): SessionUser | null => {
-  const raw = localStorage.getItem('user')
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as SessionUser
-  } catch {
-    localStorage.removeItem('user')
-    return null
-  }
-}
-
-const getLandingByRole = (role: string) => (role === 'Operador' ? '/tickets' : '/dashboard')
+import { getLandingByRole, getSessionUser } from './utils/session'
 
 const PublicOnlyRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = getSessionUser()
@@ -44,17 +21,10 @@ const PublicOnlyRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   return <Navigate to={getLandingByRole(user.role)} replace />
 }
 
-const ProtectedRoute: FC<{ children: React.ReactNode; allowedRoles?: AppRole[] }> = ({
-  children,
-  allowedRoles,
-}) => {
+const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = getSessionUser()
 
   if (!user) return <Navigate to="/login" replace />
-
-  if (allowedRoles && !allowedRoles.includes(user.role as AppRole)) {
-    return <Navigate to={getLandingByRole(user.role)} replace />
-  }
 
   return <>{children}</>
 }
@@ -128,7 +98,7 @@ const App: FC = () => (
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['Administrador']}>
+          <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -137,7 +107,7 @@ const App: FC = () => (
       <Route
         path="/stock"
         element={
-          <ProtectedRoute allowedRoles={['Administrador']}>
+          <ProtectedRoute>
             <Stock />
           </ProtectedRoute>
         }
@@ -146,7 +116,7 @@ const App: FC = () => (
       <Route
         path="/settings/*"
         element={
-          <ProtectedRoute allowedRoles={['Administrador']}>
+          <ProtectedRoute>
             <Settings />
           </ProtectedRoute>
         }
@@ -160,7 +130,7 @@ const App: FC = () => (
       <Route
         path="/tickets"
         element={
-          <ProtectedRoute allowedRoles={['Administrador', 'Operador']}>
+          <ProtectedRoute>
             <Tickets />
           </ProtectedRoute>
         }
@@ -169,7 +139,7 @@ const App: FC = () => (
       <Route
         path="/register"
         element={
-          <ProtectedRoute allowedRoles={['Administrador', 'Operador']}>
+          <ProtectedRoute>
             <RegisterOS />
           </ProtectedRoute>
         }
