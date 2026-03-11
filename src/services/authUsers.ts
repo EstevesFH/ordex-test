@@ -2,12 +2,7 @@ import { supabase } from './supabase'
 
 type UserStatus = 'Ativo' | 'Inativo'
 
-const getFunctionsBaseUrl = () => {
-  const url = import.meta.env.VITE_SUPABASE_URL as string
-  return `${url}/functions/v1/manage-auth-users`
-}
-
-type ManageAuthUsersAction = 'create' | 'reset_password'
+type ManageAuthUsersAction = 'create' | 'update_user'
 
 const callManageAuthUsers = async <T>(
   action: ManageAuthUsersAction,
@@ -25,22 +20,18 @@ const callManageAuthUsers = async <T>(
     throw new Error('Sessão inválida para executar operação de usuários')
   }
 
-  const response = await fetch(getFunctionsBaseUrl(), {
-    method: 'POST',
+  const { data, error } = await supabase.functions.invoke('manage-auth-users', {
+    body: { action, ...payload },
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ action, ...payload }),
   })
 
-  const json = await response.json().catch(() => ({}))
-
-  if (!response.ok) {
-    throw new Error((json as { error?: string }).error || 'Erro ao chamar função de usuários')
+  if (error) {
+    throw new Error(error.message || 'Erro ao chamar função de usuários')
   }
 
-  return json as T
+  return data as T
 }
 
 export interface ManagedProfileUser {
@@ -74,17 +65,16 @@ export const authUsersService = {
       .select('id, name, email, role, status, created_at')
       .order('created_at', { ascending: false })
 
-    if (error) {
-      throw error
-    }
+    if (error) throw error
 
     return (data ?? []) as ManagedProfileUser[]
   },
 
   create: async (input: CreateManagedAuthUserInput) => {
     return callManageAuthUsers<{ success: boolean; userId: string }>('create', {
-      ...input,
+      name: input.name.trim(),
       email: input.email.trim().toLowerCase(),
+      role: input.role,
       status: input.status ?? 'Ativo',
     })
   },
@@ -93,8 +83,7 @@ export const authUsersService = {
     const { error } = await supabase
       .from('profiles')
       .update({
-        name: input.name,
-        email: input.email.trim().toLowerCase(),
+        name: input.name.trim(),
         role: input.role,
         status: input.status,
       })
@@ -106,11 +95,17 @@ export const authUsersService = {
   },
 
   resetPassword: async (input: { email: string }): Promise<boolean> => {
-    const result = await callManageAuthUsers<{ success?: boolean }>('reset_password', {
-      email: input.email.trim().toLowerCase(),
-      redirectTo: `${window.location.origin}/reset-password`,
-    })
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      input.email.trim().toLowerCase(),
+      {
+        redirectTo: `${window.location.origin}/reset-password`,
+      },
+    )
 
-    return Boolean(result.success)
+    if (error) {
+      throw new Error(error.message || 'Erro ao enviar redefinição de senha')
+    }
+
+    return true
   },
 }
