@@ -6,6 +6,8 @@ import { getLandingByRole, type AppRole } from '@/utils/session'
 import Button from '@/components/Button'
 import * as S from './styles'
 
+const FIFTEEN_MINUTES = 15 * 60 * 1000
+
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,20 +18,71 @@ const Login = () => {
 
   useEffect(() => {
     const restoreSession = async () => {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const user = sessionData.session?.user
-      if (!user) return
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const authUser = sessionData.session?.user
 
-      const profileData = await getProfileData(user.id, user.email)
+        if (!authUser) return
 
-    if (now - (user.lastActive || now) < fifteenMinutes) {
-      navigate(getLandingByRole(user.role), { replace: true })
+        const savedUser = localStorage.getItem('user')
+        const parsedUser = savedUser ? JSON.parse(savedUser) : null
+        const currentTime = Date.now()
+
+        if (
+          parsedUser &&
+          parsedUser.id === authUser.id &&
+          currentTime - (parsedUser.lastActive || currentTime) < FIFTEEN_MINUTES
+        ) {
+          navigate(getLandingByRole(parsedUser.role as AppRole), { replace: true })
+          return
+        }
+
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('name, role, status')
+          .eq('id', authUser.id)
+          .maybeSingle()
+
+        if (profileError) {
+          console.error('Erro ao buscar perfil:', profileError)
+          return
+        }
+
+        const role = ((profileData?.role as string) || 'Operador') as AppRole
+        const status = ((profileData?.status as string) || 'Ativo').toLowerCase()
+        const displayName =
+          (profileData?.name as string) ||
+          (authUser.user_metadata?.name as string) ||
+          authUser.email?.split('@')[0] ||
+          'Usuário'
+
+        if (status !== 'ativo') {
+          await supabase.auth.signOut()
+          localStorage.removeItem('user')
+          return
+        }
+
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            id: authUser.id,
+            username: authUser.email,
+            name: displayName,
+            role,
+            lastActive: Date.now(),
+          }),
+        )
+
+        navigate(getLandingByRole(role), { replace: true })
+      } catch (err) {
+        console.error('Erro ao restaurar sessão:', err)
+      }
     }
 
     restoreSession()
   }, [navigate])
 
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -45,18 +98,26 @@ const Login = () => {
         return
       }
 
-      const { data: profileData } = await supabase
+      const currentUser = signInData.user
+
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('name, role, status')
-        .eq('id', signInData.user.id)
+        .eq('id', currentUser.id)
         .maybeSingle()
 
-      const role = ((profileData?.role as string) || (signInData.user.app_metadata?.role as string) || 'Operador') as AppRole
-      const status = ((profileData?.status as string) || (signInData.user.app_metadata?.status as string) || 'Ativo').toLowerCase()
+      if (profileError) {
+        console.error('Erro ao buscar perfil:', profileError)
+        setError('Não foi possível carregar o perfil do usuário.')
+        return
+      }
+
+      const role = ((profileData?.role as string) || 'Operador') as AppRole
+      const status = ((profileData?.status as string) || 'Ativo').toLowerCase()
       const displayName =
         (profileData?.name as string) ||
-        (signInData.user.user_metadata?.name as string) ||
-        (signInData.user.email?.split('@')[0] as string) ||
+        (currentUser.user_metadata?.name as string) ||
+        currentUser.email?.split('@')[0] ||
         'Usuário'
 
       if (status !== 'ativo') {
