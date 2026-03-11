@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { AppLayout } from '@/layouts/AppLayout';
 
-import { HomePage } from '@/pages/Home';
 import { Login } from '@/pages/Login';
 import { RegisterOS } from '@/pages/RegisterOS';
 import { ViewTickets } from '@/pages/ViewTickets';
@@ -24,7 +23,6 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterOS />} />
         <Route path="/view-tickets" element={<ViewTickets />} />
