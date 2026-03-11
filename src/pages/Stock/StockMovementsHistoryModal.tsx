@@ -23,7 +23,7 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
-  const [userNamesById, setUserNamesById] = useState<Record<number, string>>({})
+  const [userNamesById, setUserNamesById] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const loadMovements = async () => {
@@ -51,13 +51,13 @@ const StockMovementsHistoryModal: React.FC<StockMovementsHistoryModalProps> = ({
 
       if (ids.length > 0) {
         const { data } = await supabase
-          .from('users')
-          .select('id, name, username')
+          .from('profiles')
+          .select('id, name, email')
           .in('id', ids)
 
         if (data) {
-          const names = data.reduce<Record<number, string>>((acc, user) => {
-            acc[user.id as number] = (user.name as string) || (user.username as string) || `Usuário #${user.id}`
+          const names = data.reduce<Record<string, string>>((acc, user) => {
+            acc[user.id as string] = (user.name as string) || (user.email as string) || `Usuário #${user.id}`
             return acc
           }, {})
 
