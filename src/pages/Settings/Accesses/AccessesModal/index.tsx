@@ -75,7 +75,8 @@ const AccessesModal = ({
       onUpdated()
     } catch (error) {
       console.error(error)
-      alert('Erro ao salvar usuário')
+      const message = error instanceof Error ? error.message : 'Erro ao salvar usuário'
+      alert(message)
     } finally {
       setSaving(false)
     }

@@ -87,7 +87,8 @@ const AccessesSettings = () => {
       alert(`E-mail de redefinição enviado para ${email}`)
     } catch (error) {
       console.error(error)
-      alert('Erro ao enviar e-mail de redefinição de senha')
+      const message = error instanceof Error ? error.message : 'Erro ao enviar e-mail de redefinição de senha'
+      alert(message)
     }
   }
 
