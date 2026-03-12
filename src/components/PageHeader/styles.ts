@@ -7,12 +7,11 @@ export const Container = styled.div`
   gap: ${ds.spacing.md};
 `
 
-/* Breadcrumbs */
-
 export const Breadcrumbs = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
   font-size: ${ds.typography.size.sm};
   color: ${ds.colors.textSecondary};
 `
@@ -21,36 +20,38 @@ export const BreadcrumbItem = styled.div<{ $clickable: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
-
+  color: ${({ $clickable }) =>
+    $clickable ? ds.colors.textSecondary : ds.colors.primary};
   cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
+  transition: color ${ds.transitions.fast};
 
   &:hover {
     color: ${({ $clickable }) =>
       $clickable ? ds.colors.primary : ds.colors.textSecondary};
   }
+
+  span {
+    white-space: nowrap;
+  }
 `
 
-/* Back button */
-
 export const BackButton = styled.button`
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-
+  width: fit-content;
+  padding: 0;
   border: none;
   background: transparent;
-
   font-size: ${ds.typography.size.sm};
   color: ${ds.colors.textSecondary};
-
   cursor: pointer;
+  transition: color ${ds.transitions.fast};
 
   &:hover {
     color: ${ds.colors.primary};
   }
 `
-
-/* Main row */
 
 export const Row = styled.div`
   display: flex;
@@ -66,12 +67,11 @@ export const Left = styled.div`
   gap: 6px;
 `
 
-/* Title */
-
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 
   h1 {
     margin: 0;
@@ -92,20 +92,14 @@ export const Description = styled.p`
   color: ${ds.colors.textSecondary};
 `
 
-/* Badge */
-
 export const Badge = styled.span`
   font-size: 12px;
   font-weight: ${ds.typography.weight.semibold};
-
   background: ${ds.colors.primaryPale};
   color: ${ds.colors.primary};
-
   padding: 4px 10px;
   border-radius: 999px;
 `
-
-/* Actions */
 
 export const Actions = styled.div`
   display: flex;
