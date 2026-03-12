@@ -1,97 +1,104 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { FiEdit, FiEye } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
-import type { Ticket } from '../../types'
-import { FiEye, FiEdit } from 'react-icons/fi'
+import { Pagination } from '@/components/Pagination'
+import { PageHeader } from '@/components/PageHeader'
+import Button from '@/components/Button'
+import { Filter } from '@/components/Filter'
 import { TicketModal } from './TicketModal'
 import * as S from './styles'
-import { Loader } from '@/components/Loader'
-import { Pagination } from '@/components/Pagination'
-import { Button } from '@/components/Button'
-import { Filter } from '@/components/Filter'
-import type { FilterField } from '@/components/Filter'
-import { getSessionUser } from '@/utils/session'
+
+import type { Ticket } from '@/types'
+
+type TicketModalMode = 'view' | 'edit'
 
 const Tickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState('')
+
   const [page, setPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
-  const [mode, setMode] = useState<'view' | 'edit'>('view')
 
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [filterPrioridade, setFilterPrioridade] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const canEditTickets = getSessionUser()?.role === 'Administrador'
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+  const [mode, setMode] = useState<TicketModalMode>('view')
 
   const fetchTickets = async () => {
     setLoading(true)
-    setError(null)
+    setError('')
 
-    const { data, error } = await supabase
-      .from('tickets')
-      .select('*')
-      .order('id', { ascending: false })
+    try {
+      const { data, error } = await supabase
+        .from('tickets')
+        .select(`
+          id,
+          solicitante,
+          local,
+          prioridade,
+          produto,
+          descricao,
+          status,
+          dataabertura,
+          retorno,
+          datatermino,
+          asset_id,
+          service_type
+        `)
+        .order('id', { ascending: false })
 
-    if (error) {
-      console.error(error)
-      setError('Erro ao carregar tickets. Tente novamente.')
+      if (error) {
+        console.error('Erro ao buscar tickets:', error)
+        setError('Não foi possível carregar as ordens de serviço.')
+        setTickets([])
+        return
+      }
+
+      setTickets((data ?? []) as Ticket[])
+    } catch (err) {
+      console.error('Erro ao buscar tickets:', err)
+      setError('Ocorreu um erro ao carregar as ordens de serviço.')
       setTickets([])
-    } else {
-      setTickets(data as Ticket[])
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   useEffect(() => {
     fetchTickets()
   }, [])
 
-  const filteredTickets = tickets
-    .filter(t => {
-      const matchSearch = 
-        t.solicitante.toLowerCase().includes(search.toLowerCase()) ||
-        t.local.toLowerCase().includes(search.toLowerCase()) ||
-        t.produto.toLowerCase().includes(search.toLowerCase()) ||
-        t.descricao.toLowerCase().includes(search.toLowerCase())
-      
-      const matchStatus = filterStatus ? t.status === filterStatus : true
-      const matchPrioridade = filterPrioridade ? t.prioridade === filterPrioridade : true
-      
-      return matchSearch && matchStatus && matchPrioridade
+  const filteredTickets = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase()
+
+    return tickets.filter(ticket => {
+      const matchesSearch =
+        !normalizedSearch ||
+        ticket.solicitante?.toLowerCase().includes(normalizedSearch) ||
+        ticket.local?.toLowerCase().includes(normalizedSearch) ||
+        ticket.produto?.toLowerCase().includes(normalizedSearch) ||
+        ticket.descricao?.toLowerCase().includes(normalizedSearch) ||
+        String(ticket.id).includes(normalizedSearch)
+
+      const matchesStatus =
+        !filterStatus || ticket.status === filterStatus
+
+      const matchesPrioridade =
+        !filterPrioridade || ticket.prioridade === filterPrioridade
+
+      return matchesSearch && matchesStatus && matchesPrioridade
     })
-    .sort((a, b) => b.id - a.id)
+  }, [tickets, search, filterStatus, filterPrioridade])
 
-  const paginatedTickets = filteredTickets.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  )
-
-  const openView = (ticket: Ticket) => {
-    setSelectedTicket(ticket)
-    setMode('view')
-  }
-
-  const openEdit = (ticket: Ticket) => {
-    setSelectedTicket(ticket)
-    setMode('edit')
-  }
-
-  const closeModal = () => setSelectedTicket(null)
-
-  const handleUpdated = () => {
-    fetchTickets()
-    closeModal()
-  }
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage)
-    setPage(1)
-  }
+  const paginatedTickets = useMemo(() => {
+    const start = (page - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return filteredTickets.slice(start, end)
+  }, [filteredTickets, page, itemsPerPage])
 
   const clearFilters = () => {
     setSearch('')
@@ -100,35 +107,85 @@ const Tickets = () => {
     setPage(1)
   }
 
-  const filterFields: FilterField[] = [
-    { label: 'Buscar', type: 'text', value: search, onChange: setSearch },
-    { 
-      label: 'Status', 
-      type: 'select', 
-      value: filterStatus, 
-      onChange: setFilterStatus, 
-      options: ['Aberto', 'Em Andamento', 'Aguardando', 'Finalizado'] 
-    },
-    { 
-      label: 'Prioridade', 
-      type: 'select', 
-      value: filterPrioridade, 
-      onChange: setFilterPrioridade, 
-      options: ['Alta', 'Baixa'] 
-    }
-  ]
-
-  if (loading) {
-    return <Loader />
+  const handleItemsPerPageChange = (count: number) => {
+    setItemsPerPage(count)
+    setPage(1)
   }
 
-  let tableContent
-  if (error) {
-    tableContent = <S.ErrorMessage>{error}</S.ErrorMessage>
-  } else if (filteredTickets.length === 0) {
-    tableContent = <S.EmptyMessage>Nenhuma OS encontrada</S.EmptyMessage>
-  } else {
-    tableContent = (
+  const openViewModal = (ticket: Ticket) => {
+    setSelectedTicket(ticket)
+    setMode('view')
+  }
+
+  const openEditModal = (ticket: Ticket) => {
+    setSelectedTicket(ticket)
+    setMode('edit')
+  }
+
+  const closeModal = () => {
+    setSelectedTicket(null)
+  }
+
+  const handleUpdated = async () => {
+    closeModal()
+    await fetchTickets()
+  }
+
+  const filterFields = [
+    {
+      type: 'text' as const,
+      name: 'search',
+      label: 'Buscar',
+      placeholder: 'ID, solicitante, local, produto...',
+      value: search,
+      onChange: (value: string) => setSearch(value),
+    },
+    {
+      type: 'select' as const,
+      name: 'status',
+      label: 'Status',
+      value: filterStatus,
+      onChange: (value: string) => setFilterStatus(value),
+      options: [
+        { label: 'Todos', value: '' },
+        { label: 'Aberto', value: 'Aberto' },
+        { label: 'Em Andamento', value: 'Em Andamento' },
+        { label: 'Aguardando', value: 'Aguardando' },
+        { label: 'Finalizado', value: 'Finalizado' },
+      ],
+    },
+    {
+      type: 'select' as const,
+      name: 'prioridade',
+      label: 'Prioridade',
+      value: filterPrioridade,
+      onChange: (value: string) => setFilterPrioridade(value),
+      options: [
+        { label: 'Todas', value: '' },
+        { label: 'Alta', value: 'Alta' },
+        { label: 'Baixa', value: 'Baixa' },
+      ],
+    },
+  ]
+
+  const tableContent = (() => {
+    if (loading) {
+      return <S.EmptyMessage>Carregando ordens de serviço...</S.EmptyMessage>
+    }
+
+    if (error) {
+      return <S.ErrorMessage>{error}</S.ErrorMessage>
+    }
+
+    if (filteredTickets.length === 0) {
+      return (
+        <S.EmptyMessage>
+          Nenhuma ordem de serviço encontrada.
+        </S.EmptyMessage>
+      )
+    }
+
+    return (
       <>
         <S.TableWrapper>
           <table>
@@ -137,11 +194,10 @@ const Tickets = () => {
                 <th>#</th>
                 <th>Solicitante</th>
                 <th>Local</th>
-                <th>Prioridade</th>
                 <th>Produto</th>
-                <th>Descrição</th>
+                <th>Prioridade</th>
                 <th>Status</th>
-                <th>Ação</th>
+                <th>Ações</th>
               </tr>
             </thead>
 
@@ -149,34 +205,42 @@ const Tickets = () => {
               {paginatedTickets.map(ticket => (
                 <tr key={ticket.id}>
                   <td>{ticket.id}</td>
-                  <td>{ticket.solicitante}</td>
-                  <td>{ticket.local}</td>
-                  <td>{ticket.prioridade}</td>
-                  <td>{ticket.produto}</td>
-                  <td title={ticket.descricao}>
-                    <S.TruncatedText>{ticket.descricao}</S.TruncatedText>
+                  <td>
+                    <S.TruncatedText title={ticket.solicitante}>
+                      {ticket.solicitante}
+                    </S.TruncatedText>
                   </td>
                   <td>
-                    <S.Status status={ticket.status}>
-                      {ticket.status}
-                    </S.Status>
+                    <S.TruncatedText title={ticket.local}>
+                      {ticket.local}
+                    </S.TruncatedText>
+                  </td>
+                  <td>
+                    <S.TruncatedText title={ticket.produto}>
+                      {ticket.produto}
+                    </S.TruncatedText>
+                  </td>
+                  <td>{ticket.prioridade}</td>
+                  <td>
+                    <S.Status status={ticket.status}>{ticket.status}</S.Status>
                   </td>
                   <td>
                     <S.Actions>
-                      <button 
-                        onClick={() => openView(ticket)}
-                        aria-label="Visualizar ticket"
+                      <button
+                        type="button"
+                        title="Visualizar"
+                        onClick={() => openViewModal(ticket)}
                       >
                         <FiEye />
                       </button>
-                      {canEditTickets && (
-                        <button 
-                          onClick={() => openEdit(ticket)}
-                          aria-label="Editar ticket"
-                        >
-                          <FiEdit />
-                        </button>
-                      )}
+
+                      <button
+                        type="button"
+                        title="Editar"
+                        onClick={() => openEditModal(ticket)}
+                      >
+                        <FiEdit />
+                      </button>
                     </S.Actions>
                   </td>
                 </tr>
@@ -185,40 +249,52 @@ const Tickets = () => {
           </table>
         </S.TableWrapper>
 
-        <Pagination
-          totalItems={filteredTickets.length}
-          onPageChange={setPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-        />
+        {filteredTickets.length > 0 && (
+          <Pagination
+            totalItems={filteredTickets.length}
+            currentPage={page}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        )}
       </>
     )
-  }
+  })()
 
   return (
-    <>
-      <S.Header>
-        <h1>Ordens de Serviço</h1>
-        <S.Controls>
-          {(search || filterStatus || filterPrioridade) && (
+    <S.Container>
+      <PageHeader
+        title="Ordens de Serviço"
+        actions={
+          <>
+            {(search || filterStatus || filterPrioridade) && (
+              <Button
+                title="Limpar filtros"
+                variant="secondary"
+                size="small"
+                onClick={clearFilters}
+              />
+            )}
+
             <Button
-              title="Limpar filtros"
+              title="Filtrar"
               variant="secondary"
               size="small"
-              onClick={clearFilters}
+              onClick={() => setIsFilterOpen(true)}
             />
-          )}
-          <Button 
-            title="Filtrar" 
-            variant="secondary" 
-            size="small"
-            onClick={() => setIsFilterOpen(true)} 
-          />
-        </S.Controls>
-      </S.Header>
+          </>
+        }
+      />
 
       <S.TableCard>
         <S.TableHeader>
-          <h2>{filteredTickets.length} {filteredTickets.length === 1 ? 'OS encontrada' : 'OS encontradas'}</h2>
+          <h2>
+            {filteredTickets.length}{' '}
+            {filteredTickets.length === 1
+              ? 'OS encontrada'
+              : 'OS encontradas'}
+          </h2>
         </S.TableHeader>
 
         {tableContent}
@@ -228,7 +304,10 @@ const Tickets = () => {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         fields={filterFields}
-        onApply={() => { setPage(1); setIsFilterOpen(false) }}
+        onApply={() => {
+          setPage(1)
+          setIsFilterOpen(false)
+        }}
       />
 
       {selectedTicket && (
@@ -239,7 +318,7 @@ const Tickets = () => {
           onUpdated={handleUpdated}
         />
       )}
-    </>
+    </S.Container>
   )
 }
 

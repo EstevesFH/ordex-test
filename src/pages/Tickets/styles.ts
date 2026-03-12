@@ -1,19 +1,22 @@
 import styled from 'styled-components'
 import { designSystem as ds } from '@/styles/designSystem'
 
-export const Header = styled.div`
-  margin-bottom: ${ds.spacing.lg};
+export const Container = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: ${ds.spacing.md};
+  flex-direction: column;
+  gap: ${ds.spacing.xl};
+  `
 
+export const Header = styled.div`
   h1 {
-    font-size: ${ds.typography.size.xxl};
-    font-weight: ${ds.typography.weight.bold};
-    color: ${ds.colors.textMain};
     margin: 0;
+    font-size: 2rem;
+    color: ${ds.colors.primary};
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: ${ds.colors.textSecondary};
   }
 `
 
