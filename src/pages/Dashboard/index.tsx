@@ -1,16 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Pagination } from '@/components/Pagination'
 import { supabase } from '@/services/supabase'
-import {
-  Alert,
-  Badge,
-  Container,
-  Header,
-  StatusCard,
-  StatusGrid,
-  TableCard,
-  TableWrapper,
-} from './styles'
+import { Loader } from '@/components/Loader'
+import * as S from './styles'
+
 
 interface Ticket {
   id: number
@@ -110,48 +103,48 @@ const Dashboard = () => {
   }
 
   if (loading) {
-    return <Container>Carregando dashboard...</Container>
+    return <Loader />
   }
 
   return (
-    <Container>
-      <Header>
-        <h1>Dashboard</h1>
+    <S.Container>
+      <S.Header>
+        <h1>Painel de Controle</h1>
         <p>Visão geral dos chamados e status do atendimento.</p>
-      </Header>
+      </S.Header>
 
-      <StatusGrid>
-        <StatusCard>
+      <S.StatusGrid>
+        <S.StatusCard>
           <span>Em Aberto</span>
           <strong>{statusCount.aberto}</strong>
-        </StatusCard>
+        </S.StatusCard>
 
-        <StatusCard>
+        <S.StatusCard>
           <span>Em Andamento</span>
           <strong>{statusCount.andamento}</strong>
-        </StatusCard>
+        </S.StatusCard>
 
-        <StatusCard>
+        <S.StatusCard>
           <span>Aguardando</span>
           <strong>{statusCount.aguardando}</strong>
-        </StatusCard>
+        </S.StatusCard>
 
-        <StatusCard>
+        <S.StatusCard>
           <span>Finalizadas</span>
           <strong>{statusCount.finalizado}</strong>
-        </StatusCard>
-      </StatusGrid>
+        </S.StatusCard>
+      </S.StatusGrid>
 
       {firstOpenTicket && (
-        <Alert>
-          <strong>Prioridade:</strong> existe OS em aberto para <b>{firstOpenTicket.local}</b>.
-        </Alert>
+        <S.Alert>
+          <strong>Prioridade:</strong> Ordem de serviço em aberto em <b>{firstOpenTicket.local}</b>.
+        </S.Alert>
       )}
 
-      <TableCard>
-        <h2>Chamados em aberto / andamento</h2>
+      <S.TableCard>
+        <h2>Ordens Pendentes</h2>
 
-        <TableWrapper>
+        <S.TableWrapper>
           <table>
             <thead>
               <tr>
@@ -174,7 +167,7 @@ const Dashboard = () => {
                     <td>{ticket.produto}</td>
                     <td>{ticket.prioridade}</td>
                     <td>
-                      <Badge status={ticket.status}>{ticket.status}</Badge>
+                      <S.Badge status={ticket.status}>{ticket.status}</S.Badge>
                     </td>
                   </tr>
                 ))
@@ -185,7 +178,7 @@ const Dashboard = () => {
               )}
             </tbody>
           </table>
-        </TableWrapper>
+        </S.TableWrapper>
 
         {visibleTickets.length > 0 && (
           <Pagination
@@ -196,8 +189,8 @@ const Dashboard = () => {
             onItemsPerPageChange={handleItemsPerPageChange}
           />
         )}
-      </TableCard>
-    </Container>
+      </S.TableCard>
+    </S.Container>
   )
 }
 
