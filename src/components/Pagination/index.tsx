@@ -2,6 +2,13 @@ import React, { useState } from 'react'
 import Button from '../Button'
 import * as S from './styles'
 
+import {
+FiChevronLeft,
+FiChevronRight,
+FiChevronsLeft,
+FiChevronsRight,
+} from 'react-icons/fi'
+
 export interface PaginationProps {
   totalItems?: number
   currentPage?: number
@@ -69,10 +76,10 @@ const Pagination = ({
       </div>
 
       <div>
-        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(1)}>{'<<'}</Button>
-        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(page - 1)}>{'<'}</Button>
-        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(page + 1)}>{'>'}</Button>
-        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(totalPages)}>{'>>'}</Button>
+        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(1)}><FiChevronsLeft /></Button>
+        <Button size="small" variant="secondary" disabled={page === 1} onClick={() => changePage(page - 1)}><FiChevronLeft /></Button>
+        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(page + 1)}><FiChevronRight /></Button>
+        <Button size="small" variant="secondary" disabled={page === totalPages} onClick={() => changePage(totalPages)}><FiChevronsRight /></Button>
       </div>
     </S.PaginationContainer>
   )
