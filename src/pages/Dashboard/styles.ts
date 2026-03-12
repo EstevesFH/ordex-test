@@ -11,7 +11,7 @@ export const Header = styled.div`
   h1 {
     margin: 0;
     font-size: 2rem;
-    color: ${ds.colors.textMain};
+    color: ${ds.colors.primary};
   }
 
   p {

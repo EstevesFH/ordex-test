@@ -110,7 +110,7 @@ const Dashboard = () => {
     <S.Container>
       <S.Header>
         <h1>Painel de Controle</h1>
-        <p>Visão geral dos chamados e status do atendimento.</p>
+        <p>Visão geral das Ordens de Serviço e status do atendimento.</p>
       </S.Header>
 
       <S.StatusGrid>
