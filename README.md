@@ -1,3 +1,8 @@
+Uso	Cor	Tailwind
+Primary (OR)	#1E3A8A	blue-900
+Accent (DEX)	#22D3EE	cyan-400
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

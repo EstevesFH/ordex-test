@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { FiMail, FiLock } from 'react-icons/fi'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { FiLock, FiMail, FiShield } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
 import { getLandingByRole, type AppRole } from '@/utils/session'
 import Button from '@/components/Button'
@@ -110,10 +110,11 @@ const Login = () => {
     setError('')
 
     try {
-      const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { data: signInData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
 
       if (authError || !signInData.user) {
         setError('E-mail ou senha inválidos.')
@@ -170,67 +171,86 @@ const Login = () => {
 
   return (
     <S.Container>
-      <S.LoginCard>
-        <S.LogoWrapper>
+      <S.BrandSection>
+        <S.BrandContent>
+          <span className="eyebrow">Gestão Operacional Inteligente</span>
+
           <img
-            src="/logo.svg"
+            className="logo"
+            src="/logoAux.png"
             alt="ORDEX Logo"
-            width={120}
-            style={{
-              filter: "brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1350%) hue-rotate(220deg)"
-            }}
           />
-          <div className="icon-box">
-            <FiLock size={30} />
-          </div>
-          <h1>Painel de Gestão</h1>
-          <p>Entre com suas credenciais</p>
-        </S.LogoWrapper>
 
-        <form onSubmit={handleSubmit}>
-          <S.InputGroup>
-            <label htmlFor="login-email">E-mail</label>
-            <div className="input-wrapper">
-              <FiMail size={18} />
-              <input
-                id="login-email"
-                type="email"
-                value={email} 
-                onChange={e => setEmail(e.target.value)}
-                placeholder="nome@empresa.com"
-                required
-              />
+          <h1>Controle operacional com mais clareza, agilidade e confiança.</h1>
+
+          <p>
+            Centralize ordens de serviço, estoque de almoxarifado e inventário
+            em uma experiência robusta, organizada e pronta para a operação do dia a dia.
+          </p>
+        </S.BrandContent>
+      </S.BrandSection>
+
+      <S.LoginSection>
+        <S.LoginCard>
+          <S.LogoWrapper>
+            <div className="icon-box">
+              <FiShield size={28} />
             </div>
-          </S.InputGroup>
+            <h1>Painel de Gestão</h1>
+            <p>Entre com suas credenciais.</p>
+          </S.LogoWrapper>
 
-          <S.InputGroup>
-            <label htmlFor="login-password">Senha</label>
-            <div className="input-wrapper">
-              <FiLock size={18} />
-              <input
-                id="login-password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-          </S.InputGroup>
+          <form onSubmit={handleSubmit}>
+            <S.InputGroup>
+              <label htmlFor="login-email">E-mail</label>
+              <div className="input-wrapper">
+                <FiMail size={18} />
+                <input
+                  id="login-email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="nome@empresa.com"
+                  autoComplete="email"
+                  required
+                />
+              </div>
+            </S.InputGroup>
 
-          {error && <S.ErrorAlert>{error}</S.ErrorAlert>}
+            <S.InputGroup>
+              <label htmlFor="login-password">Senha</label>
+              <div className="input-wrapper">
+                <FiLock size={18} />
+                <input
+                  id="login-password"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  required
+                />
+              </div>
+            </S.InputGroup>
 
-          <S.ForgotLink>
-            <Link to="/forgot-password">Esqueci minha senha</Link>
-          </S.ForgotLink>
+            {error && <S.ErrorAlert>{error}</S.ErrorAlert>}
 
-          <S.ActionWrapper>
-            <Button primary type="submit" disabled={loading}>
-              {loading ? 'Autenticando...' : 'Entrar'}
-            </Button>
-          </S.ActionWrapper>
-        </form>
-      </S.LoginCard>
+            <S.ForgotLink>
+              <Link to="/forgot-password">Esqueci minha senha</Link>
+            </S.ForgotLink>
+
+            <S.ActionWrapper>
+              <Button primary type="submit" disabled={loading}>
+                {loading ? 'Autenticando...' : 'Entrar'}
+              </Button>
+            </S.ActionWrapper>
+          </form>
+
+          <S.FooterNote>
+            ORDEX • 2026. Todos os direitos reservados.
+          </S.FooterNote>
+        </S.LoginCard>
+      </S.LoginSection>
     </S.Container>
   )
 }

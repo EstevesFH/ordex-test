@@ -1,12 +1,12 @@
 export const designSystem = {
   colors: {
-    primary: 'oklch(37.9% 0.146 265.522)',
-    primaryHover: 'oklch(32% 0.146 265.522)',
-    primaryLight: 'oklch(50% 0.13 265.522)',
-    primaryPale: 'oklch(95% 0.03 265.522)',
+    primary: '#1E3A8A',
+    primaryHover: '#1E40AF',
+    primaryLight: '#22D3EE',
+    primaryPale: '#DBEAFE',
 
     background: '#f8fafc',
-    backgroundDark: 'oklch(37.9% 0.146 265.522)',
+    backgroundDark: '#1E3A8A',
     surface: '#ffffff',
     surfaceHover: '#f1f5f9',
 
