@@ -6,6 +6,7 @@ export const designSystem = {
     primaryPale: '#DBEAFE',
 
     background: '#f8fafc',
+    backgroundLight: '#22D3EE',
     backgroundDark: '#1E3A8A',
     surface: '#ffffff',
     surfaceHover: '#f1f5f9',
