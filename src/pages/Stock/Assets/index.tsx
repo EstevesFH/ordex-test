@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { FiEdit, FiEye, FiPlus } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
 import { PageHeader } from '@/components/PageHeader'
-import { Pagination } from '@/components/Pagination'
 import { Button } from '@/components/Button'
 import { Filter } from '@/components/Filter'
+import { Table, type Column } from '@/components/Table'
 import type { FilterField } from '@/components/Filter'
 import { getSessionUser } from '@/utils/session'
 import AssetModal from './AssetModal'
@@ -127,9 +127,9 @@ const Assets: React.FC = () => {
   }, [])
 
   const filteredAssets = useMemo(() => {
-    return assets.filter(asset => {
-      const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = search.trim().toLowerCase()
 
+    return assets.filter((asset) => {
       const matchesSearch =
         !normalizedSearch ||
         asset.asset_name?.toLowerCase().includes(normalizedSearch) ||
@@ -138,11 +138,8 @@ const Assets: React.FC = () => {
         asset.locations?.name?.toLowerCase().includes(normalizedSearch) ||
         asset.profiles?.name?.toLowerCase().includes(normalizedSearch)
 
-      const matchesStatus =
-        !filterStatus || asset.status === filterStatus
-
-      const matchesCategory =
-        !filterCategory || asset.category === filterCategory
+      const matchesStatus = !filterStatus || asset.status === filterStatus
+      const matchesCategory = !filterCategory || asset.category === filterCategory
 
       return matchesSearch && matchesStatus && matchesCategory
     })
@@ -231,6 +228,82 @@ const Assets: React.FC = () => {
     },
   ]
 
+  const columns: Column<AssetRow>[] = [
+    {
+      title: 'ID',
+      key: 'id',
+    },
+    {
+      title: 'Asset',
+      key: 'asset_name',
+      render: (asset) => <strong>{asset.asset_name}</strong>,
+    },
+    {
+      title: 'Categoria',
+      key: 'category',
+      render: (asset) => {
+        const category = asset.category ?? 'other'
+        const badgeCategory =
+          category === 'durable' ? 'durable' : 'consumable'
+
+        return (
+          <S.CategoryBadge category={badgeCategory}>
+            {categoryLabelMap[category] || 'Outro'}
+          </S.CategoryBadge>
+        )
+      },
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (asset) => {
+        const label = statusLabelMap[asset.status || 'available'] || 'Ativo'
+
+        return <S.StatusBadge status={label}>{label}</S.StatusBadge>
+      },
+    },
+    {
+      title: 'Local',
+      key: 'location',
+      render: (asset) => asset.locations?.name || '-',
+    },
+    {
+      title: 'Responsável',
+      key: 'responsavel',
+      render: (asset) => asset.profiles?.name || '-',
+    },
+    {
+      title: 'Patrimônio',
+      key: 'tag_number',
+      render: (asset) => asset.tag_number || '-',
+    },
+    {
+      title: 'Ações',
+      key: 'actions',
+      render: (asset) => (
+        <S.Actions>
+          <S.ActionButton
+            type="button"
+            title="Visualizar"
+            onClick={() => openDetail(asset)}
+          >
+            <FiEye size={16} />
+          </S.ActionButton>
+
+          {!isSupervisor && (
+            <S.ActionButton
+              type="button"
+              title="Editar"
+              onClick={() => openEdit(asset)}
+            >
+              <FiEdit size={16} />
+            </S.ActionButton>
+          )}
+        </S.Actions>
+      ),
+    },
+  ]
+
   return (
     <>
       <PageHeader
@@ -263,106 +336,33 @@ const Assets: React.FC = () => {
         }
       />
 
-      {isFilterOpen && (
-        <Filter
-          isOpen={isFilterOpen}
-          fields={filterFields}
-          onClose={() => setIsFilterOpen(false)}
-          onApply={() => {
-            setPage(1)
-            setIsFilterOpen(false)
-          }}
-        />
-      )}
+      <Filter
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={() => {
+          setPage(1)
+          setIsFilterOpen(false)
+        }}
+      />
 
-      <S.TableCard>
-        <S.TableHeader>
-          <h2>
-            {filteredAssets.length}{' '}
-            {filteredAssets.length === 1 ? 'asset encontrado' : 'assets encontrados'}
-          </h2>
-        </S.TableHeader>
-
-        {loading ? (
-          <S.EmptyMessage>Carregando assets...</S.EmptyMessage>
-        ) : (
-          <S.TableWrapper>
-            {filteredAssets.length === 0 ? (
-              <S.EmptyMessage>Nenhum asset encontrado.</S.EmptyMessage>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Asset</th>
-                    <th>Categoria</th>
-                    <th>Status</th>
-                    <th>Local</th>
-                    <th>Responsável</th>
-                    <th>Patrimônio</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {paginatedAssets.map(asset => (
-                    <tr key={asset.id}>
-                      <td>{asset.id}</td>
-                      <td>
-                        <strong>{asset.asset_name}</strong>
-                      </td>
-                      <td>
-                        <S.CategoryBadge category={asset.category === 'durable' ? 'durable' : 'consumable'}>
-                          {categoryLabelMap[asset.category || 'other'] || 'Outro'}
-                        </S.CategoryBadge>
-                      </td>
-                      <td>
-                        <S.StatusBadge status={statusLabelMap[asset.status || 'available'] || 'Ativo'}>
-                          {statusLabelMap[asset.status || 'available'] || 'Ativo'}
-                        </S.StatusBadge>
-                      </td>
-                      <td>{asset.locations?.name || '-'}</td>
-                      <td>{asset.profiles?.name || '-'}</td>
-                      <td>{asset.tag_number || '-'}</td>
-                      <td>
-                        <S.Actions>
-                          <S.ActionButton
-                            type="button"
-                            title="Visualizar"
-                            onClick={() => openDetail(asset)}
-                          >
-                            <FiEye size={16} />
-                          </S.ActionButton>
-
-                          {!isSupervisor && (
-                            <S.ActionButton
-                              type="button"
-                              title="Editar"
-                              onClick={() => openEdit(asset)}
-                            >
-                              <FiEdit size={16} />
-                            </S.ActionButton>
-                          )}
-                        </S.Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </S.TableWrapper>
-        )}
-
-        {filteredAssets.length > 0 && (
-          <Pagination
-            currentPage={page}
-            totalPages={Math.ceil(filteredAssets.length / itemsPerPage)}
-            itemsPerPage={itemsPerPage}
-            onPageChange={setPage}
-            onItemsPerPageChange={handleItemsPerPageChange}
-          />
-        )}
-      </S.TableCard>
+      <Table<AssetRow>
+        title={`${filteredAssets.length} ${
+          filteredAssets.length === 1
+            ? 'asset encontrado'
+            : 'assets encontrados'
+        }`}
+        columns={columns}
+        data={paginatedAssets}
+        loading={loading}
+        emptyMessage="Nenhum asset encontrado."
+        rowKey={(asset) => asset.id}
+        totalItems={filteredAssets.length}
+        currentPage={page}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setPage}
+        onItemsPerPageChange={handleItemsPerPageChange}
+      />
 
       {isFormOpen && (
         <AssetModal
