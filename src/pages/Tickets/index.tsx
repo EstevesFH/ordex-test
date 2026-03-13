@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiEye } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
-import { Loader } from '@/components/Loader'
-import { PageHeader } from '@/components/PageHeader'
-import Button from '@/components/Button'
-import { Filter } from '@/components/Filter'
-import { Table, type Column } from '@/components/Table'
+import { Loader, PageHeader, Button, Filter, Table, type Column } from '@/components'
 import { TicketModal } from './TicketModal'
 import * as S from './styles'
 

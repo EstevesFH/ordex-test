@@ -2,12 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/services/supabase'
 import { FiEdit } from 'react-icons/fi'
 import * as S from './styles'
-import { Loader } from '@/components/Loader'
-import { Pagination } from '@/components/Pagination'
 import { ProductsModal } from './ProductsModal'
-import { Button } from '@/components/Button'
-import { Filter } from '@/components/Filter'
-import type { FilterField } from '@/components/Filter'
+import { Loader, Pagination, Button, Filter, type  FilterField } from '@/components'
 
 export interface Product {
   id: number

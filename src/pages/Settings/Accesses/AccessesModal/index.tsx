@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/Button'
+import { Button } from '@/components'
 import { authUsersService } from '@/services/authUsers'
 import type { Accesses } from '../index'
 import * as S from './styles'

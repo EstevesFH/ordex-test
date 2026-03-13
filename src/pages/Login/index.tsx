@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FiLock, FiMail, FiShield } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
 import { getLandingByRole, type AppRole } from '@/utils/session'
-import Button from '@/components/Button'
+import { Button }from '@/components'
 import * as S from './styles'
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000

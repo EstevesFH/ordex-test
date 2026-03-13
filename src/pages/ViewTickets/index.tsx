@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiArrowLeft } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
-import Button from '@/components/Button'
+import { Button } from '@/components'
 import { supabase } from '@/services/supabase'
 import type { Ticket } from '../../types'
 import * as S from './styles'

@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiCheckCircle } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
-import { Loader } from '@/components/Loader'
-import { PageHeader } from '@/components/PageHeader'
-import Button from '@/components/Button'
+import { Loader,  Button, PageHeader } from '@/components'
 import type { Location, Product } from '../../types'
 import * as S from './styles'
 

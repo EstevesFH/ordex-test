@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/services/supabase'
-import { Loader } from '@/components/Loader'
-import { PageHeader } from '@/components/PageHeader'
-import { Table, type Column } from '@/components/Table'
+import { Loader, PageHeader, Table, type Column} from '@/components'
 import * as S from './styles'
 
 interface Ticket {

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { FiMail, FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/services/supabase'
-import { Button } from '@/components/Button'
+import { Button } from '@/components'
 import * as S from './styles'
 
 const ForgotPassword: React.FC = () => {

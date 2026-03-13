@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Ticket } from '../../../types'
 import { supabase } from '@/services/supabase'
 import * as S from './styles'
-import { Button } from '@/components/Button'
+import { Button } from '@/components'
 
 interface TicketModalProps {
   ticket: Ticket
