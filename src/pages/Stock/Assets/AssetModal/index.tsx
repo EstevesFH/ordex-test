@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { FiX } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
 import { getSessionUser } from '@/utils/session'
-import Button from '@/components/Button'
+import { Button } from '@/components'
 import * as S from './styles'
 import type { AssetRow } from '../index'
 

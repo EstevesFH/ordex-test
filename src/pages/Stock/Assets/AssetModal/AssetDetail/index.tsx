@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FiClock, FiMapPin, FiUser, FiX } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
-import { Button } from '@/components/Button'
+import { Button } from '@/components'
 import * as S from './styles'
 import type { AssetRow } from '../../index'
 
