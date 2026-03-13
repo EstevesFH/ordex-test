@@ -7,17 +7,11 @@ export const Container = styled.div`
   gap: ${ds.spacing.xl};
 `
 
-export const Header = styled.div`
-  h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: ${ds.colors.primary};
-  }
-
-  p {
-    margin: 8px 0 0;
-    color: ${ds.colors.textSecondary};
-  }
+export const LoaderWrapper = styled.div`
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export const StatusGrid = styled.div`
@@ -61,45 +55,6 @@ export const Alert = styled.div`
   border-radius: ${ds.radius.md};
   padding: ${ds.spacing.md};
   color: ${ds.colors.error};
-`
-
-export const TableCard = styled.div`
-  background: ${ds.colors.surface};
-  border: 1px solid ${ds.colors.border};
-  border-radius: ${ds.radius.lg};
-  padding: ${ds.spacing.lg};
-
-  h2 {
-    margin: 0 0 ${ds.spacing.md};
-    color: ${ds.colors.textMain};
-    font-size: 1.125rem;
-  }
-`
-
-export const TableWrapper = styled.div`
-  overflow-x: auto;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th,
-  td {
-    text-align: left;
-    padding: 12px 8px;
-    border-bottom: 1px solid ${ds.colors.border};
-    font-size: 0.9rem;
-  }
-
-  th {
-    color: ${ds.colors.textSecondary};
-    font-weight: 600;
-  }
-
-  td {
-    color: ${ds.colors.textMain};
-  }
 `
 
 const getBadgeBackground = (status: string) => {

@@ -121,6 +121,7 @@ const App: FC = () => (
           </ProtectedRoute>
         }
       >
+        <Route index element={<Navigate to="warehouse" replace />} />
         <Route path="assets" element={<Assets />} />
         <Route path="warehouse" element={<Warehouse />} />
       </Route>

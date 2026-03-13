@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Pagination } from '@/components/Pagination'
 import { supabase } from '@/services/supabase'
 import { Loader } from '@/components/Loader'
+import { PageHeader } from '@/components/PageHeader'
+import { Table, type Column } from '@/components/Table'
 import * as S from './styles'
-
 
 interface Ticket {
   id: number
@@ -33,26 +33,21 @@ const Dashboard = () => {
       try {
         const { data, error } = await supabase
           .from('tickets')
-          .select(
-            `
-              id,
-              solicitante,
-              local,
-              prioridade,
-              produto,
-              descricao,
-              status,
-              dataabertura,
-              retorno,
-              datatermino,
-              asset_id,
-              service_type
-            `,
-          )
+          .select(`
+            id,
+            solicitante,
+            local,
+            prioridade,
+            produto,
+            descricao,
+            status,
+            dataabertura,
+            retorno,
+            datatermino,
+            asset_id,
+            service_type
+          `)
           .order('id', { ascending: false })
-
-        console.log('tickets data:', data)
-        console.log('tickets error:', error)
 
         if (error) {
           console.error('Erro ao buscar tickets:', error)
@@ -74,122 +69,122 @@ const Dashboard = () => {
 
   const statusCount = useMemo(
     () => ({
-      aberto: tickets.filter(t => t.status === 'Aberto').length,
-      andamento: tickets.filter(t => t.status === 'Em Andamento').length,
-      aguardando: tickets.filter(t => t.status === 'Aguardando').length,
-      finalizado: tickets.filter(t => t.status === 'Finalizado').length,
+      aberto: tickets.filter((t) => t.status === 'Aberto').length,
+      andamento: tickets.filter((t) => t.status === 'Em Andamento').length,
+      aguardando: tickets.filter((t) => t.status === 'Aguardando').length,
+      finalizado: tickets.filter((t) => t.status === 'Finalizado').length,
     }),
     [tickets],
   )
 
-  const firstOpenTicket = useMemo(() => tickets.find(t => t.status === 'Aberto'), [tickets])
+  const firstOpenTicket = useMemo(
+    () => tickets.find((t) => t.status === 'Aberto'),
+    [tickets],
+  )
 
   const visibleTickets = useMemo(
     () =>
-      tickets.filter(t =>
+      tickets.filter((t) =>
         ['Aberto', 'Em Andamento', 'Aguardando'].includes(t.status),
       ),
     [tickets],
   )
 
-  const paginatedTickets = useMemo(
-    () => visibleTickets.slice((page - 1) * itemsPerPage, page * itemsPerPage),
-    [visibleTickets, page, itemsPerPage],
-  )
+  const paginatedTickets = useMemo(() => {
+    const start = (page - 1) * itemsPerPage
+    const end = start + itemsPerPage
+
+    return visibleTickets.slice(start, end)
+  }, [visibleTickets, page, itemsPerPage])
 
   const handleItemsPerPageChange = (count: number) => {
     setItemsPerPage(count)
     setPage(1)
   }
 
-  if (loading) {
-    return <Loader />
-  }
+  const columns: Column<Ticket>[] = [
+    {
+      title: '#',
+      key: 'id',
+    },
+    {
+      title: 'Solicitante',
+      key: 'solicitante',
+    },
+    {
+      title: 'Local',
+      key: 'local',
+    },
+    {
+      title: 'Produto',
+      key: 'produto',
+    },
+    {
+      title: 'Prioridade',
+      key: 'prioridade',
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (ticket) => (
+        <S.Badge status={ticket.status}>{ticket.status}</S.Badge>
+      ),
+    },
+  ]
 
   return (
     <S.Container>
-      <S.Header>
-        <h1>Painel de Controle</h1>
-        <p>Visão geral das Ordens de Serviço e status do atendimento.</p>
-      </S.Header>
+      <PageHeader title="Painel de Controle" />
 
-      <S.StatusGrid>
-        <S.StatusCard>
-          <span>Em Aberto</span>
-          <strong>{statusCount.aberto}</strong>
-        </S.StatusCard>
+      {loading ? (
+        <S.LoaderWrapper>
+          <Loader />
+        </S.LoaderWrapper>
+      ) : (
+        <>
+          <S.StatusGrid>
+            <S.StatusCard>
+              <span>Em Aberto</span>
+              <strong>{statusCount.aberto}</strong>
+            </S.StatusCard>
 
-        <S.StatusCard>
-          <span>Em Andamento</span>
-          <strong>{statusCount.andamento}</strong>
-        </S.StatusCard>
+            <S.StatusCard>
+              <span>Em Andamento</span>
+              <strong>{statusCount.andamento}</strong>
+            </S.StatusCard>
 
-        <S.StatusCard>
-          <span>Aguardando</span>
-          <strong>{statusCount.aguardando}</strong>
-        </S.StatusCard>
+            <S.StatusCard>
+              <span>Aguardando</span>
+              <strong>{statusCount.aguardando}</strong>
+            </S.StatusCard>
 
-        <S.StatusCard>
-          <span>Finalizadas</span>
-          <strong>{statusCount.finalizado}</strong>
-        </S.StatusCard>
-      </S.StatusGrid>
+            <S.StatusCard>
+              <span>Finalizadas</span>
+              <strong>{statusCount.finalizado}</strong>
+            </S.StatusCard>
+          </S.StatusGrid>
 
-      {firstOpenTicket && (
-        <S.Alert>
-          <strong>Prioridade:</strong> Ordem de serviço em aberto em <b>{firstOpenTicket.local}</b>.
-        </S.Alert>
-      )}
+          {firstOpenTicket && (
+            <S.Alert>
+              <strong>Prioridade:</strong> Ordem de serviço em aberto em{' '}
+              <b>{firstOpenTicket.local}</b>.
+            </S.Alert>
+          )}
 
-      <S.TableCard>
-        <h2>Ordens Pendentes</h2>
-
-        <S.TableWrapper>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Solicitante</th>
-                <th>Local</th>
-                <th>Produto</th>
-                <th>Prioridade</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {paginatedTickets.length > 0 ? (
-                paginatedTickets.map(ticket => (
-                  <tr key={ticket.id}>
-                    <td>{ticket.id}</td>
-                    <td>{ticket.solicitante}</td>
-                    <td>{ticket.local}</td>
-                    <td>{ticket.produto}</td>
-                    <td>{ticket.prioridade}</td>
-                    <td>
-                      <S.Badge status={ticket.status}>{ticket.status}</S.Badge>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6}>Nenhum chamado encontrado.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </S.TableWrapper>
-
-        {visibleTickets.length > 0 && (
-          <Pagination
+          <Table<Ticket>
+            title="Ordens Pendentes"
+            columns={columns}
+            data={paginatedTickets}
+            emptyMessage="Nenhum chamado encontrado."
+            rowKey={(ticket) => ticket.id}
             totalItems={visibleTickets.length}
             currentPage={page}
             itemsPerPage={itemsPerPage}
             onPageChange={setPage}
             onItemsPerPageChange={handleItemsPerPageChange}
           />
-        )}
-      </S.TableCard>
+        </>
+      )}
     </S.Container>
   )
 }

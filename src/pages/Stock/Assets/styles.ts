@@ -1,11 +1,10 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '@/styles/designSystem'
 
 export const Controls = styled.div`
   display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
+    flex-direction: column;
+    gap: ${ds.spacing.xl};
 `
 
 export const TableCard = styled.div`

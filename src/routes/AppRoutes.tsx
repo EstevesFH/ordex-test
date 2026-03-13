@@ -16,7 +16,6 @@ import { Assets } from '@/pages/Stock/Assets';
 import { Warehouse } from '@/pages/Stock/Warehouse';
 
 import { Settings } from '@/pages/Settings';
-import { UsersSettings } from '@/pages/Settings/Users';
 import { LocationsSettings } from '@/pages/Settings/Locations';
 import { ProductsSettings } from '@/pages/Settings/Products';
 import { AccessesSettings } from '@/pages/Settings/Accesses';
@@ -41,7 +40,6 @@ const AppRoutes = () => {
         <Route path="/tickets" element={<Tickets />} />
 
         <Route path="/settings" element={<Settings />}>
-          <Route path="users" element={<UsersSettings />} />
           <Route path="locations" element={<LocationsSettings />} />
           <Route path="products" element={<ProductsSettings />} />
           <Route path="accesses" element={<AccessesSettings />} />
