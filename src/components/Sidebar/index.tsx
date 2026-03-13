@@ -5,13 +5,13 @@ import {
   FiClipboard,
   FiBox,
   FiEdit3,
-  FiMenu,
   FiUser,
   FiSettings,
   FiLogOut,
   FiChevronDown,
   FiLock,
   FiMapPin,
+  FiSidebar,
 } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
 import { getSessionUser } from '@/utils/session'
@@ -31,10 +31,10 @@ type MenuItem = {
 }
 
 export const Sidebar = () => {
-  const [hovered, setHovered] = useState(false)
   const [pinned, setPinned] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const [logoHovered, setLogoHovered] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -42,6 +42,7 @@ export const Sidebar = () => {
 
   const user = getSessionUser()
   const role = user?.role || 'Operador'
+  const isOpen = pinned
 
   useEffect(() => {
     const saved = localStorage.getItem('sidebarPinned')
@@ -51,9 +52,17 @@ export const Sidebar = () => {
   }, [])
 
   useEffect(() => {
-    if (location.pathname.includes('/settings')) {
-      setSettingsOpen(true)
+    if (location.pathname.startsWith('/settings')) {
+      setOpenSubmenu('Ajustes')
+      return
     }
+
+    if (location.pathname.startsWith('/stock')) {
+      setOpenSubmenu('Estoque')
+      return
+    }
+
+    setOpenSubmenu(null)
   }, [location.pathname])
 
   useEffect(() => {
@@ -73,8 +82,6 @@ export const Sidebar = () => {
     }
   }, [])
 
-  const isOpen = pinned || hovered
-
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--sidebar-width',
@@ -87,11 +94,15 @@ export const Sidebar = () => {
   }, [isOpen])
 
   const togglePin = () => {
-    setPinned(prev => {
-      const newState = !prev
-      localStorage.setItem('sidebarPinned', String(newState))
-      return newState
+    setPinned((prev) => {
+      const next = !prev
+      localStorage.setItem('sidebarPinned', String(next))
+      return next
     })
+  }
+
+  const toggleSubmenu = (label: string) => {
+    setOpenSubmenu((prev) => (prev === label ? null : label))
   }
 
   const handleLogout = async () => {
@@ -126,67 +137,94 @@ export const Sidebar = () => {
 
     if (role === 'Operador') {
       return baseMenu.filter(
-        item =>
-          item.label === 'Tickets' ||
-          item.label === 'Registrar OS' ||
-          item.label === 'Parametrizações',
+        (item) =>
+          item.label === 'Ordens de Serviço' ||
+          item.label === 'Registrar OS',
       )
     }
 
     if (role === 'Supervisor') {
       return baseMenu.filter(
-        item =>
-          item.label === 'Dashboard' ||
-          item.label === 'Tickets' ||
-          item.label === 'Estoque' ||
-          item.label === 'Parametrizações',
+        (item) =>
+          item.label === 'Painel de Controle' ||
+          item.label === 'Ordens de Serviço' ||
+          item.label === 'Estoque',
       )
     }
 
     return baseMenu
   }, [role])
 
-  return (
-    <S.Container
-      $open={isOpen}
-      onMouseEnter={() => {
-        if (!pinned) setHovered(true)
-      }}
-      onMouseLeave={() => {
-        if (!pinned) setHovered(false)
-      }}
-    >
-      <S.Header $open={isOpen}>
-        <S.LogoArea $open={isOpen}>
-          <S.LogoImage
-            src={isOpen ? '/logo.png' : '/icon.png'}
-            alt="ORDEX Logo"
-            $open={isOpen}
-          />
-        </S.LogoArea>
+  let logoSrc: string | null = null
+  let LogoIcon: React.ComponentType<{ size?: number }> | null = null
 
-        <S.TopToggleButton
+  if (isOpen) {
+    logoSrc = '/logo.png'
+  } else if (logoHovered) {
+    LogoIcon = FiSidebar
+  } else {
+    logoSrc = '/icon.png'
+  }
+
+  return (
+    <S.Container $open={isOpen}>
+      <S.Header $open={isOpen}>
+        <S.LogoToggleArea
           type="button"
-          onClick={togglePin}
-          title={pinned ? 'Desafixar sidebar' : 'Fixar sidebar'}
           $open={isOpen}
+          onClick={() => {
+            if (!isOpen) togglePin()
+          }}
+          onMouseEnter={() => {
+            if (!isOpen) setLogoHovered(true)
+          }}
+          onMouseLeave={() => {
+            if (!isOpen) setLogoHovered(false)
+          }}
+          title={isOpen ? 'Sidebar fixa' : 'Abrir sidebar'}
         >
-          <FiMenu size={18} />
-        </S.TopToggleButton>
+          <S.LogoArea $open={isOpen}>
+            {LogoIcon ? (
+              <LogoIcon size={20} />
+            ) : (
+              <S.LogoImage
+                src={logoSrc || ''}
+                alt="ORDEX Logo"
+                $open={isOpen}
+              />
+            )}
+          </S.LogoArea>
+        </S.LogoToggleArea>
+
+        {isOpen && (
+          <S.UnpinButton
+            type="button"
+            onClick={togglePin}
+            title="Desfixar sidebar"
+          >
+            <FiSidebar size={20} />
+          </S.UnpinButton>
+        )}
       </S.Header>
 
       <S.Nav>
-        {menuItems.map(item => {
+        {menuItems.map((item) => {
           const Icon = item.icon
 
           if (item.children) {
+            const isChildActive = item.children.some((child) =>
+              location.pathname.startsWith(child.path),
+            )
+
+            const isSubmenuOpen = openSubmenu === item.label
+
             return (
               <S.SettingsWrapper key={item.label}>
                 <S.NavItem
                   type="button"
                   $open={isOpen}
-                  $active={location.pathname.includes('/settings')}
-                  onClick={() => setSettingsOpen(prev => !prev)}
+                  $active={isChildActive}
+                  onClick={() => toggleSubmenu(item.label)}
                   title={isOpen ? '' : item.label}
                 >
                   <S.IconWrap $open={isOpen}>
@@ -198,33 +236,52 @@ export const Sidebar = () => {
                   <S.Label $open={isOpen}>{item.label}</S.Label>
 
                   {isOpen && (
-                    <S.Chevron $open={settingsOpen}>
+                    <S.Chevron $open={isSubmenuOpen}>
                       <FiChevronDown size={16} />
                     </S.Chevron>
                   )}
                 </S.NavItem>
 
-                {settingsOpen && isOpen && (
-                  <S.SubMenu>
-                    {item.children.map(child => {
-                      const ChildIcon = child.icon
+                {isSubmenuOpen &&
+                  (isOpen ? (
+                    <S.SubMenu>
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon
 
-                      return (
-                        <S.SubItem
-                          key={child.path}
-                          type="button"
-                          $active={location.pathname.includes(child.path)}
-                          onClick={() => navigate(child.path)}
-                        >
-                          <S.SubItemIcon>
-                            {ChildIcon && <ChildIcon size={15} />}
-                          </S.SubItemIcon>
-                          <span>{child.label}</span>
-                        </S.SubItem>
-                      )
-                    })}
-                  </S.SubMenu>
-                )}
+                        return (
+                          <S.SubItem
+                            key={child.path}
+                            type="button"
+                            $active={location.pathname.startsWith(child.path)}
+                            onClick={() => navigate(child.path)}
+                          >
+                            <S.SubItemIcon>
+                              {ChildIcon && <ChildIcon size={15} />}
+                            </S.SubItemIcon>
+                            <span>{child.label}</span>
+                          </S.SubItem>
+                        )
+                      })}
+                    </S.SubMenu>
+                  ) : (
+                    <S.CollapsedSubMenu>
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon
+
+                        return (
+                          <S.CollapsedSubItem
+                            key={child.path}
+                            type="button"
+                            title={child.label}
+                            $active={location.pathname.startsWith(child.path)}
+                            onClick={() => navigate(child.path)}
+                          >
+                            {ChildIcon && <ChildIcon size={16} />}
+                          </S.CollapsedSubItem>
+                        )
+                      })}
+                    </S.CollapsedSubMenu>
+                  ))}
               </S.SettingsWrapper>
             )
           }
@@ -234,11 +291,11 @@ export const Sidebar = () => {
           return (
             <S.NavItem
               key={item.path}
+              type="button"
               $open={isOpen}
               $active={isActive}
               onClick={() => item.path && navigate(item.path)}
               title={isOpen ? '' : item.label}
-              type="button"
             >
               <S.IconWrap $open={isOpen}>
                 <S.IconBox>
@@ -255,7 +312,7 @@ export const Sidebar = () => {
       <S.Footer ref={profileRef}>
         <S.ProfileCard
           type="button"
-          onClick={() => setProfileOpen(prev => !prev)}
+          onClick={() => setProfileOpen((prev) => !prev)}
           $open={isOpen}
         >
           <S.ProfileAvatar>

@@ -41,6 +41,7 @@ export const LogoArea = styled.div<{ $open: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  color: ${ds.colors.white};
 `
 
 export const LogoImage = styled.img<{ $open: boolean }>`
@@ -393,5 +394,72 @@ export const FlyoutItem = styled.button<{ $danger?: boolean }>`
 
   svg {
     flex-shrink: 0;
+  }
+`
+
+export const LogoToggleArea = styled.button<{ $open: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: ${({ $open }) => ($open ? 'space-between' : 'center')};
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+`
+
+export const CollapsedMenuIcon = styled.div`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e2e8f0;
+`
+
+export const CollapsedSubMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 4px 0 8px;
+`
+
+export const CollapsedSubItem = styled.button<{ $active?: boolean }>`
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: ${({ $active }) =>
+    $active ? 'rgba(59, 130, 246, 0.15)' : 'transparent'};
+  color: ${({ $active }) => ($active ? '#60a5fa' : '#94a3b8')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+  }
+`
+
+export const UnpinButton = styled.button`
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 10px;
+  color: ${ds.colors.white};
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
   }
 `
