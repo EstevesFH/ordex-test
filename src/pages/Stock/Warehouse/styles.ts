@@ -5,6 +5,8 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${ds.spacing.xl};
+  width: 100%;
+  min-height: calc(100vh - 220px);
 `
 
 export const LoaderWrapper = styled.div`
@@ -51,6 +53,9 @@ export const AlertIcon = styled.div`
 `
 
 export const TableCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   background: ${ds.colors.surface};
   border: 1px solid ${ds.colors.border};
   border-radius: ${ds.radius.lg};
@@ -75,7 +80,9 @@ export const EmptyMessage = styled.div`
 `
 
 export const TableWrapper = styled.div`
-  max-height: 520px;
+  flex: 1;
+  min-height: 320px;
+  max-height: calc(100vh - 390px);
   overflow: auto;
 
   &::-webkit-scrollbar {
