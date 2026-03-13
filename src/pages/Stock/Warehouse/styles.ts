@@ -1,24 +1,44 @@
 import styled from 'styled-components'
+import { designSystem as ds } from '@/styles/designSystem'
 
-export const Alert = styled.div`
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.18);
-  border-left: 4px solid #f59e0b;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${ds.spacing.xl};
+`
+
+export const LoaderWrapper = styled.div`
+  min-height: calc(100vh - 160px);
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+`
+
+export const Alert = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${ds.spacing.md};
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: ${ds.radius.lg};
+  padding: ${ds.spacing.md};
+`
+
+export const AlertContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${ds.spacing.md};
 
   strong {
-    color: #fcd34d;
+    color: #b45309;
     display: block;
+    margin-bottom: 4px;
   }
 
   p {
-    margin: 4px 0 0;
-    color: #fbbf24;
+    margin: 0;
+    color: ${ds.colors.textSecondary};
     font-size: 14px;
   }
 `
@@ -26,35 +46,32 @@ export const Alert = styled.div`
 export const AlertIcon = styled.div`
   font-size: 20px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export const TableCard = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: ${ds.colors.surface};
+  border: 1px solid ${ds.colors.border};
+  border-radius: ${ds.radius.lg};
+  padding: ${ds.spacing.lg};
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.05);
 `
 
 export const TableHeader = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: ${ds.spacing.md};
 
   h2 {
     margin: 0;
     font-size: 18px;
-    color: #f1f5f9;
+    color: ${ds.colors.textMain};
   }
 `
 
 export const EmptyMessage = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-  font-size: 16px;
+  padding: ${ds.spacing.xl} ${ds.spacing.md};
+  color: ${ds.colors.textSecondary};
 `
 
 export const TableWrapper = styled.div`
@@ -63,6 +80,7 @@ export const TableWrapper = styled.div`
 
   &::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -71,7 +89,7 @@ export const TableWrapper = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.2);
+    background: transparent;
   }
 
   table {
@@ -82,63 +100,74 @@ export const TableWrapper = styled.div`
   th {
     text-align: left;
     font-size: 13px;
-    color: #ffffff;
+    color: ${ds.colors.textSecondary};
     font-weight: 600;
     padding: 10px 8px;
     position: sticky;
     top: 0;
-    background: rgba(15, 23, 42, 0.88);
-    backdrop-filter: blur(12px);
+    background: ${ds.colors.surface};
     z-index: 1;
   }
 
   td {
     font-size: 14px;
-    color: #cbd5e1;
+    color: ${ds.colors.textMain};
     padding: 16px 8px;
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    border-top: 1px solid ${ds.colors.border};
 
     strong {
-      color: #f1f5f9;
+      color: ${ds.colors.textMain};
       font-weight: 600;
     }
   }
 
   tbody tr {
-    transition: background 0.3s;
+    transition: background 0.2s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: #f8fafc;
     }
   }
 `
 
 export const QuantityCell = styled.div<{ $critical: boolean }>`
   font-weight: ${({ $critical }) => ($critical ? 700 : 500)};
-  color: ${({ $critical }) => ($critical ? '#fca5a5' : '#cbd5e1')};
+  color: ${({ $critical }) => ($critical ? '#b91c1c' : ds.colors.textMain)};
 `
 
+const getStatusBackground = (status: string) => {
+  if (status === 'Disponível') return '#ecfdf5'
+  if (status === 'Reservado') return '#fffbeb'
+  if (status === 'Indisponível') return '#fef2f2'
+  return '#f8fafc'
+}
+
+const getStatusBorderColor = (status: string) => {
+  if (status === 'Disponível') return '#a7f3d0'
+  if (status === 'Reservado') return '#fde68a'
+  if (status === 'Indisponível') return '#fecaca'
+  return '#e2e8f0'
+}
+
 const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Disponível':
-      return { bg: 'rgba(34, 197, 94, 0.1)', color: '#86efac' }
-    case 'Reservado':
-      return { bg: 'rgba(245, 158, 11, 0.1)', color: '#fcd34d' }
-    case 'Indisponível':
-      return { bg: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5' }
-    default:
-      return { bg: 'rgba(148, 163, 184, 0.1)', color: '#cbd5e1' }
-  }
+  if (status === 'Disponível') return '#047857'
+  if (status === 'Reservado') return '#b45309'
+  if (status === 'Indisponível') return '#b91c1c'
+  return '#475569'
 }
 
 export const StatusBadge = styled.span<{ status: string }>`
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
-  background: ${({ status }) => getStatusColor(status).bg};
-  color: ${({ status }) => getStatusColor(status).color};
+  font-weight: ${ds.typography.weight.semibold};
+  border: 1px solid;
+
+  background: ${({ status }) => getStatusBackground(status)};
+  border-color: ${({ status }) => getStatusBorderColor(status)};
+  color: ${({ status }) => getStatusColor(status)};
 `
 
 export const Actions = styled.div`
@@ -147,19 +176,19 @@ export const Actions = styled.div`
 `
 
 export const ActionButton = styled.button`
-  background: transparent;
-  border: none;
-  color: #64748b;
+  border: 1px solid ${ds.colors.border};
+  background: ${ds.colors.surface};
+  border-radius: ${ds.radius.md};
   cursor: pointer;
+  font-size: 16px;
+  color: ${ds.colors.textSecondary};
   padding: 6px;
-  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #60a5fa;
+    color: ${ds.colors.primary};
+    border-color: ${ds.colors.primaryLight};
   }
 `

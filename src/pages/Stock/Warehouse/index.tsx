@@ -1,15 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { FiClock, FiEdit, FiPlus, FiTrendingUp } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
-import { Pagination } from '@/components/Pagination'
-import { PageHeader } from '@/components/PageHeader'
-import { Button } from '@/components/Button'
-import { Filter } from '@/components/Filter'
-import type { FilterField } from '@/components/Filter'
-import { getSessionUser } from '@/utils/session'
-import WarehouseModal from './WarehouseModal'
-import WarehouseMovement from './WarehouseModal/WarehouseMovement'
-import WarehouseHistory from './WarehouseModal/WarehouseHistory'
+import { Pagination, PageHeader, Button } from '../../../components'
 import * as S from './styles'
 
 export interface WarehouseItemRow {
@@ -24,8 +16,6 @@ export interface WarehouseItemRow {
   updated_at: string
 }
 
-type ItemModalMode = 'create' | 'edit'
-
 const statusLabelMap: Record<WarehouseItemRow['status'], string> = {
   available: 'Disponível',
   reserved: 'Reservado',
@@ -34,47 +24,23 @@ const statusLabelMap: Record<WarehouseItemRow['status'], string> = {
 
 const Warehouse: React.FC = () => {
   const [items, setItems] = useState<WarehouseItemRow[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
   const [showCriticalOnly, setShowCriticalOnly] = useState(false)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-
   const [page, setPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
-  const [selectedItem, setSelectedItem] = useState<WarehouseItemRow | null>(null)
-  const [itemModalMode, setItemModalMode] = useState<ItemModalMode>('create')
-  const [isItemModalOpen, setIsItemModalOpen] = useState(false)
-  const [isMovementModalOpen, setIsMovementModalOpen] = useState(false)
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-
-  const currentUser = getSessionUser()
-  const isSupervisor = currentUser?.role === 'Supervisor'
-
   const fetchItems = async () => {
-    setLoading(true)
+    const { data, error } = await supabase
+      .from('warehouse_items')
+      .select('*')
+      .order('id', { ascending: false })
 
-    try {
-      const { data, error } = await supabase
-        .from('warehouse_items')
-        .select('*')
-        .order('id', { ascending: false })
-
-      if (error) {
-        console.error('Erro ao buscar warehouse_items:', error)
-        setItems([])
-        return
-      }
-
-      setItems((data ?? []) as WarehouseItemRow[])
-    } catch (error) {
-      console.error('Erro ao buscar warehouse_items:', error)
+    if (error) {
+      console.error('Erro ao buscar itens do almoxarifado:', error)
       setItems([])
-    } finally {
-      setLoading(false)
+      return
     }
+
+    setItems((data ?? []) as WarehouseItemRow[])
   }
 
   useEffect(() => {
@@ -82,25 +48,14 @@ const Warehouse: React.FC = () => {
   }, [])
 
   const lowStockItems = useMemo(
-    () => items.filter(item => item.quantity <= item.min_quantity),
+    () => items.filter((item) => item.quantity <= item.min_quantity),
     [items],
   )
 
   const filteredItems = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
-
-    return items.filter(item => {
-      const matchesSearch =
-        !normalizedSearch ||
-        item.item_name.toLowerCase().includes(normalizedSearch) ||
-        item.item_type.toLowerCase().includes(normalizedSearch)
-
-      const matchesStatus = !filterStatus || item.status === filterStatus
-      const matchesCritical = !showCriticalOnly || item.quantity <= item.min_quantity
-
-      return matchesSearch && matchesStatus && matchesCritical
-    })
-  }, [items, search, filterStatus, showCriticalOnly])
+    if (!showCriticalOnly) return items
+    return items.filter((item) => item.quantity <= item.min_quantity)
+  }, [items, showCriticalOnly])
 
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * itemsPerPage
@@ -113,99 +68,51 @@ const Warehouse: React.FC = () => {
     setPage(1)
   }
 
-  const clearFilters = () => {
-    setSearch('')
-    setFilterStatus('')
+  const handleShowCriticalItems = () => {
+    setShowCriticalOnly(true)
+    setPage(1)
+  }
+
+  const handleShowAllItems = () => {
     setShowCriticalOnly(false)
     setPage(1)
   }
 
-  const openCreate = () => {
-    setSelectedItem(null)
-    setItemModalMode('create')
-    setIsItemModalOpen(true)
+  const handleCreate = () => {
+    console.log('Novo item')
   }
 
-  const openEdit = (item: WarehouseItemRow) => {
-    setSelectedItem(item)
-    setItemModalMode('edit')
-    setIsItemModalOpen(true)
+  const handleHistory = (item: WarehouseItemRow) => {
+    console.log('Histórico do item:', item)
   }
 
-  const openMovement = (item: WarehouseItemRow) => {
-    setSelectedItem(item)
-    setIsMovementModalOpen(true)
+  const handleMovement = (item: WarehouseItemRow) => {
+    console.log('Movimentar item:', item)
   }
 
-  const openHistory = (item: WarehouseItemRow) => {
-    setSelectedItem(item)
-    setIsHistoryOpen(true)
+  const handleEdit = (item: WarehouseItemRow) => {
+    console.log('Editar item:', item)
   }
-
-  const closeItemModal = () => {
-    setSelectedItem(null)
-    setIsItemModalOpen(false)
-  }
-
-  const closeMovementModal = () => {
-    setSelectedItem(null)
-    setIsMovementModalOpen(false)
-  }
-
-  const closeHistoryModal = () => {
-    setSelectedItem(null)
-    setIsHistoryOpen(false)
-  }
-
-  const filterFields: FilterField[] = [
-    {
-      label: 'Buscar',
-      type: 'text',
-      value: search,
-      onChange: setSearch,
-    },
-    {
-      label: 'Status',
-      type: 'select',
-      value: filterStatus,
-      onChange: setFilterStatus,
-      options: [
-        { value: '', label: 'Todos' },
-        { value: 'available', label: 'Disponível' },
-        { value: 'reserved', label: 'Reservado' },
-        { value: 'unavailable', label: 'Indisponível' },
-      ],
-    },
-  ]
 
   return (
-    <>
+    <S.Container>
       <PageHeader
-        title="Warehouse"
+        title="Almoxarifado"
         actions={
           <>
-            {(search || filterStatus || showCriticalOnly) && (
+            {showCriticalOnly && (
               <Button
-                title="Limpar filtros"
+                title="Ver todos"
                 variant="secondary"
                 size="small"
-                onClick={clearFilters}
+                onClick={handleShowAllItems}
               />
             )}
 
-            <Button
-              title="Filtrar"
-              variant="secondary"
-              size="small"
-              onClick={() => setIsFilterOpen(true)}
-            />
-
-            {!isSupervisor && (
-              <Button onClick={openCreate}>
-                <FiPlus size={18} />
-                Novo Item
-              </Button>
-            )}
+            <Button onClick={handleCreate}>
+              <FiPlus size={18} />
+              Novo Item
+            </Button>
           </>
         }
       />
@@ -227,126 +134,105 @@ const Warehouse: React.FC = () => {
           <Button
             variant="secondary"
             size="small"
-            onClick={() => {
-              setShowCriticalOnly(true)
-              setIsFilterOpen(false)
-            }}
+            onClick={handleShowCriticalItems}
           >
             Ver itens
           </Button>
         </S.Alert>
       )}
 
-      {isFilterOpen && (
-        <Filter
-          isOpen={isFilterOpen}
-          fields={filterFields}
-          onClose={() => setIsFilterOpen(false)}
-          onApply={() => {
-            setPage(1)
-            setIsFilterOpen(false)
-          }}
-        />
-      )}
-
       <S.TableCard>
         <S.TableHeader>
           <h2>
             {filteredItems.length}{' '}
-            {filteredItems.length === 1 ? 'item encontrado' : 'itens encontrados'}
+            {filteredItems.length === 1
+              ? 'item encontrado'
+              : 'itens encontrados'}
           </h2>
         </S.TableHeader>
 
-        {loading ? (
-          <S.EmptyMessage>Carregando itens...</S.EmptyMessage>
-        ) : (
-          <S.TableWrapper>
-            {filteredItems.length === 0 ? (
-              <S.EmptyMessage>Nenhum item encontrado.</S.EmptyMessage>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Item</th>
-                    <th>Tipo</th>
-                    <th>Quantidade</th>
-                    <th>Mínimo</th>
-                    <th>Status</th>
-                    <th>Valor Unit.</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
+        <S.TableWrapper>
+          {filteredItems.length === 0 ? (
+            <S.EmptyMessage>Nenhum item encontrado.</S.EmptyMessage>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Tipo</th>
+                  <th>Quantidade</th>
+                  <th>Mínimo</th>
+                  <th>Status</th>
+                  <th>Valor Unit.</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {paginatedItems.map(item => {
-                    const isCritical = item.quantity <= item.min_quantity
+              <tbody>
+                {paginatedItems.map((item) => {
+                  const isCritical = item.quantity <= item.min_quantity
 
-                    return (
-                      <tr key={item.id}>
-                        <td>{item.id}</td>
-                        <td>
-                          <strong>{item.item_name}</strong>
-                        </td>
-                        <td>{item.item_type}</td>
-                        <td>
-                          <S.QuantityCell $critical={isCritical}>
-                            {item.quantity}
-                          </S.QuantityCell>
-                        </td>
-                        <td>{item.min_quantity}</td>
-                        <td>
-                          <S.StatusBadge status={statusLabelMap[item.status]}>
-                            {statusLabelMap[item.status]}
-                          </S.StatusBadge>
-                        </td>
-                        <td>
-                          {item.unit_price === null
-                            ? '-'
-                            : new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                              }).format(item.unit_price)}
-                        </td>
-                        <td>
-                          <S.Actions>
-                            <S.ActionButton
-                              type="button"
-                              title="Histórico"
-                              onClick={() => openHistory(item)}
-                            >
-                              <FiClock size={16} />
-                            </S.ActionButton>
+                  return (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td>
+                        <strong>{item.item_name}</strong>
+                      </td>
+                      <td>{item.item_type}</td>
+                      <td>
+                        <S.QuantityCell $critical={isCritical}>
+                          {item.quantity}
+                        </S.QuantityCell>
+                      </td>
+                      <td>{item.min_quantity}</td>
+                      <td>
+                        <S.StatusBadge status={statusLabelMap[item.status]}>
+                          {statusLabelMap[item.status]}
+                        </S.StatusBadge>
+                      </td>
+                      <td>
+                        {item.unit_price === null
+                          ? '-'
+                          : new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
+                            }).format(item.unit_price)}
+                      </td>
+                      <td>
+                        <S.Actions>
+                          <S.ActionButton
+                            type="button"
+                            title="Histórico"
+                            onClick={() => handleHistory(item)}
+                          >
+                            <FiClock size={16} />
+                          </S.ActionButton>
 
-                            {!isSupervisor && (
-                              <S.ActionButton
-                                type="button"
-                                title="Movimentar"
-                                onClick={() => openMovement(item)}
-                              >
-                                <FiTrendingUp size={16} />
-                              </S.ActionButton>
-                            )}
+                          <S.ActionButton
+                            type="button"
+                            title="Movimentar"
+                            onClick={() => handleMovement(item)}
+                          >
+                            <FiTrendingUp size={16} />
+                          </S.ActionButton>
 
-                            {!isSupervisor && (
-                              <S.ActionButton
-                                type="button"
-                                title="Editar"
-                                onClick={() => openEdit(item)}
-                              >
-                                <FiEdit size={16} />
-                              </S.ActionButton>
-                            )}
-                          </S.Actions>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            )}
-          </S.TableWrapper>
-        )}
+                          <S.ActionButton
+                            type="button"
+                            title="Editar"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <FiEdit size={16} />
+                          </S.ActionButton>
+                        </S.Actions>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </S.TableWrapper>
 
         {filteredItems.length > 0 && (
           <Pagination
@@ -358,37 +244,7 @@ const Warehouse: React.FC = () => {
           />
         )}
       </S.TableCard>
-
-      {isItemModalOpen && (
-        <WarehouseModal
-          item={selectedItem}
-          mode={itemModalMode}
-          onClose={closeItemModal}
-          onSuccess={() => {
-            closeItemModal()
-            fetchItems()
-          }}
-        />
-      )}
-
-      {isMovementModalOpen && selectedItem && (
-        <WarehouseMovement
-          item={selectedItem}
-          onClose={closeMovementModal}
-          onSuccess={() => {
-            closeMovementModal()
-            fetchItems()
-          }}
-        />
-      )}
-
-      {isHistoryOpen && selectedItem && (
-        <WarehouseHistory
-          item={selectedItem}
-          onClose={closeHistoryModal}
-        />
-      )}
-    </>
+    </S.Container>
   )
 }
 
