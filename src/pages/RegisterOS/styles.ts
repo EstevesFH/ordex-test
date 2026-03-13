@@ -141,3 +141,10 @@ export const ProtocolBadge = styled.div`
   margin-bottom: ${ds.spacing.md};
   border: 1px dashed ${ds.colors.border};
 `
+
+export const LoaderWrapper = styled.div`
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiEye } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { Loader } from '@/components/Loader'
 import { PageHeader } from '@/components/PageHeader'
 import Button from '@/components/Button'
 import { Filter } from '@/components/Filter'
@@ -247,22 +248,27 @@ const Tickets = () => {
         }
       />
 
-      <Table<Ticket>
-        title={`${filteredTickets.length} ${
-          filteredTickets.length === 1 ? 'OS encontrada' : 'OS encontradas'
-        }`}
-        columns={columns}
-        data={paginatedTickets}
-        loading={loading}
-        error={error}
-        emptyMessage="Nenhuma ordem de serviço encontrada."
-        rowKey={(ticket) => ticket.id}
-        totalItems={filteredTickets.length}
-        currentPage={page}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setPage}
-        onItemsPerPageChange={handleItemsPerPageChange}
-      />
+      {loading ? (
+        <S.LoaderWrapper>
+          <Loader />
+        </S.LoaderWrapper>
+      ) : (
+        <Table<Ticket>
+          title={`${filteredTickets.length} ${
+            filteredTickets.length === 1 ? 'OS encontrada' : 'OS encontradas'
+          }`}
+          columns={columns}
+          data={paginatedTickets}
+          error={error}
+          emptyMessage="Nenhuma ordem de serviço encontrada."
+          rowKey={(ticket) => ticket.id}
+          totalItems={filteredTickets.length}
+          currentPage={page}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       <Filter
         isOpen={isFilterOpen}

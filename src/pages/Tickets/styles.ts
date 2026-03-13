@@ -89,3 +89,10 @@ export const Actions = styled.div`
     }
   }
 `
+
+export const LoaderWrapper = styled.div`
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`

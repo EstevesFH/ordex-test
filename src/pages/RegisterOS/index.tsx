@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiCheckCircle } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { Loader } from '@/components/Loader'
 import { PageHeader } from '@/components/PageHeader'
 import Button from '@/components/Button'
 import type { Location, Product } from '../../types'
@@ -14,6 +15,7 @@ interface SessionUser {
 const RegisterOS = () => {
   const [locations, setLocations] = useState<Location[]>([])
   const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [protocol, setProtocol] = useState<number | null>(null)
 
@@ -86,8 +88,24 @@ const RegisterOS = () => {
   }
 
   useEffect(() => {
-    fetchTable<Location>('locations', setLocations, 'id, locationName, status')
-    fetchTableProducts()
+    const loadData = async () => {
+      setLoading(true)
+
+      try {
+        await Promise.all([
+          fetchTable<Location>(
+            'locations',
+            setLocations,
+            'id, locationName, status',
+          ),
+          fetchTableProducts(),
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [])
 
   const handleChange = (
@@ -153,88 +171,94 @@ const RegisterOS = () => {
     <S.Container>
       <PageHeader title="Nova Ordem de Serviço" />
 
-      <S.FormCard>
-        <h2>Informações da Solicitação</h2>
+      {loading ? (
+        <S.LoaderWrapper>
+          <Loader />
+        </S.LoaderWrapper>
+      ) : (
+        <S.FormCard>
+          <h2>Informações da Solicitação</h2>
 
-        <form onSubmit={handleSubmit}>
-          <S.FormGrid>
-            <S.FormGroup>
-              <label htmlFor="solicitante">Solicitante</label>
-              <input id="solicitante" value={loggedSolicitante} disabled />
-            </S.FormGroup>
+          <form onSubmit={handleSubmit}>
+            <S.FormGrid>
+              <S.FormGroup>
+                <label htmlFor="solicitante">Solicitante</label>
+                <input id="solicitante" value={loggedSolicitante} disabled />
+              </S.FormGroup>
+
+              <S.FormGroup>
+                <label htmlFor="localId">Local / Setor</label>
+                <select
+                  id="localId"
+                  name="localId"
+                  value={form.localId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Selecione o local</option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.locationName}
+                    </option>
+                  ))}
+                </select>
+              </S.FormGroup>
+
+              <S.FormGroup>
+                <label htmlFor="prioridade">Prioridade</label>
+                <select
+                  id="prioridade"
+                  name="prioridade"
+                  value={form.prioridade}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Defina a urgência</option>
+                  <option value="Alta">🔴 Alta</option>
+                  <option value="Baixa">🟢 Baixa</option>
+                </select>
+              </S.FormGroup>
+
+              <S.FormGroup>
+                <label htmlFor="produtoId">Equipamento / Produto</label>
+                <select
+                  id="produtoId"
+                  name="produtoId"
+                  value={form.produtoId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Selecione o item</option>
+                  {products.map((prod) => (
+                    <option key={prod.id} value={prod.id}>
+                      {prod.productName}
+                    </option>
+                  ))}
+                </select>
+              </S.FormGroup>
+            </S.FormGrid>
 
             <S.FormGroup>
-              <label htmlFor="localId">Local / Setor</label>
-              <select
-                id="localId"
-                name="localId"
-                value={form.localId}
+              <label htmlFor="descricao">Descrição do Problema</label>
+              <textarea
+                id="descricao"
+                name="descricao"
+                value={form.descricao}
                 onChange={handleChange}
+                rows={5}
+                placeholder="Detalhe o que está acontecendo..."
                 required
-              >
-                <option value="">Selecione o local</option>
-                {locations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.locationName}
-                  </option>
-                ))}
-              </select>
+              />
             </S.FormGroup>
 
-            <S.FormGroup>
-              <label htmlFor="prioridade">Prioridade</label>
-              <select
-                id="prioridade"
-                name="prioridade"
-                value={form.prioridade}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Defina a urgência</option>
-                <option value="Alta">🔴 Alta</option>
-                <option value="Baixa">🟢 Baixa</option>
-              </select>
-            </S.FormGroup>
-
-            <S.FormGroup>
-              <label htmlFor="produtoId">Equipamento / Produto</label>
-              <select
-                id="produtoId"
-                name="produtoId"
-                value={form.produtoId}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Selecione o item</option>
-                {products.map((prod) => (
-                  <option key={prod.id} value={prod.id}>
-                    {prod.productName}
-                  </option>
-                ))}
-              </select>
-            </S.FormGroup>
-          </S.FormGrid>
-
-          <S.FormGroup>
-            <label htmlFor="descricao">Descrição do Problema</label>
-            <textarea
-              id="descricao"
-              name="descricao"
-              value={form.descricao}
-              onChange={handleChange}
-              rows={5}
-              placeholder="Detalhe o que está acontecendo..."
-              required
-            />
-          </S.FormGroup>
-
-          <S.FooterActions>
-            <Button primary type="submit" style={{ padding: '16px 60px' }}>
-              Registrar OS
-            </Button>
-          </S.FooterActions>
-        </form>
-      </S.FormCard>
+            <S.FooterActions>
+              <Button primary type="submit" style={{ padding: '16px 60px' }}>
+                Registrar OS
+              </Button>
+            </S.FooterActions>
+          </form>
+        </S.FormCard>
+      )}
 
       {showSuccessModal && (
         <S.ModalOverlay>
