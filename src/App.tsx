@@ -7,6 +7,8 @@ import { AccessesSettings } from './pages/Settings/Accesses'
 import { LocationsSettings } from './pages/Settings/Locations'
 import { ProductsSettings } from './pages/Settings/Products'
 import { Stock } from './pages/Stock'
+import { Assets } from './pages/Stock/Assets'
+import { Warehouse } from './pages/Stock/Warehouse'
 import { Tickets } from './pages/Tickets'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { Login } from './pages/Login'
@@ -118,7 +120,10 @@ const App: FC = () => (
             <Stock />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="assets" element={<Assets />} />
+        <Route path="warehouse" element={<Warehouse />} />
+      </Route>
 
       <Route
         path="/settings/*"
@@ -128,7 +133,7 @@ const App: FC = () => (
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="locations" replace />} />
+        <Route index element={<Navigate to="accesses" replace />} />
         <Route path="locations" element={<LocationsSettings />} />
         <Route path="products" element={<ProductsSettings />} />
         <Route path="accesses" element={<AccessesSettings />} />

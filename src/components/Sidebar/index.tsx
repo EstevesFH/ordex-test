@@ -104,7 +104,14 @@ export const Sidebar = () => {
     const baseMenu: MenuItem[] = [
       { icon: FiHome, label: 'Painel de Controle', path: '/dashboard' },
       { icon: FiClipboard, label: 'Ordens de Serviço', path: '/tickets' },
-      { icon: FiBox, label: 'Estoque', path: '/stock' },
+      {
+        icon: FiBox,
+        label: 'Estoque',
+        children: [
+          { label: 'Almoxarifado', path: '/stock/warehouse', icon: FiLock },
+          { label: 'Inventário', path: '/stock/assets', icon: FiMapPin },
+        ],
+      },
       { icon: FiEdit3, label: 'Registrar OS', path: '/register' },
       {
         icon: FiSettings,

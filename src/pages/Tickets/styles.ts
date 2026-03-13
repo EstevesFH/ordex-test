@@ -7,19 +7,6 @@ export const Container = styled.div`
   gap: ${ds.spacing.xl};
   `
 
-export const Header = styled.div`
-  h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: ${ds.colors.primary};
-  }
-
-  p {
-    margin: 8px 0 0;
-    color: ${ds.colors.textSecondary};
-  }
-`
-
 export const Controls = styled.div`
   display: flex;
   gap: ${ds.spacing.sm};

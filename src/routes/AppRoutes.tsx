@@ -12,6 +12,8 @@ import { ResetPassword } from '@/pages/ResetPassword';
 import { Dashboard } from '@/pages/Dashboard';
 import { Tickets } from '@/pages/Tickets';
 import { Stock } from '@/pages/Stock';
+import { Assets } from '@/pages/Stock/Assets';
+import { Warehouse } from '@/pages/Stock/Warehouse';
 
 import { Settings } from '@/pages/Settings';
 import { UsersSettings } from '@/pages/Settings/Users';
@@ -32,7 +34,10 @@ const AppRoutes = () => {
 
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/stock" element={<Stock />} />
+        <Route path="/stock" element={<Stock />} >
+          <Route path="assets" element={<Assets />} />
+          <Route path="warehouse" element={<Warehouse />} />
+        </Route>
         <Route path="/tickets" element={<Tickets />} />
 
         <Route path="/settings" element={<Settings />}>
