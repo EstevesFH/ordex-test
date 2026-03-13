@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FiCheckCircle } from 'react-icons/fi'
 import { supabase } from '@/services/supabase'
+import { PageHeader } from '@/components/PageHeader'
 import Button from '@/components/Button'
 import type { Location, Product } from '../../types'
 import * as S from './styles'
-import { FiCheckCircle } from 'react-icons/fi'
 
 interface SessionUser {
   username?: string
@@ -26,6 +27,7 @@ const RegisterOS = () => {
   const sessionUser = useMemo<SessionUser | null>(() => {
     const raw = localStorage.getItem('user')
     if (!raw) return null
+
     try {
       return JSON.parse(raw) as SessionUser
     } catch {
@@ -62,11 +64,6 @@ const RegisterOS = () => {
     }
   }
 
-  useEffect(() => {
-    fetchTable<Location>('locations', setLocations, 'id, locationName, status')
-    fetchTableProducts()
-  }, [])
-
   const fetchTableProducts = async () => {
     try {
       const { data, error } = await supabase
@@ -76,6 +73,7 @@ const RegisterOS = () => {
         .ilike('productType', 'Equipamento')
 
       if (error) {
+        console.error('Erro ao buscar products:', error)
         setProducts([])
         return
       }
@@ -87,19 +85,33 @@ const RegisterOS = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    fetchTable<Location>('locations', setLocations, 'id, locationName, status')
+    fetchTableProducts()
+  }, [])
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    setForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
 
-    const localNome = locations.find(l => l.id === Number(form.localId))?.locationName
-    const produtoNome = products.find(p => p.id === Number(form.produtoId))?.productName
+    const localNome = locations.find(
+      (location) => location.id === Number(form.localId),
+    )?.locationName
+
+    const produtoNome = products.find(
+      (product) => product.id === Number(form.produtoId),
+    )?.productName
 
     if (!localNome || !produtoNome) {
-      alert('Erro ao processar os dados: Verifique se todos os campos foram selecionados corretamente.')
+      alert(
+        'Erro ao processar os dados: verifique se todos os campos foram selecionados corretamente.',
+      )
       return
     }
 
@@ -114,7 +126,10 @@ const RegisterOS = () => {
     }
 
     try {
-      const { data, error } = await supabase.from('tickets').insert([payload]).select()
+      const { data, error } = await supabase
+        .from('tickets')
+        .insert([payload])
+        .select()
 
       if (error) throw error
 
@@ -136,14 +151,11 @@ const RegisterOS = () => {
 
   return (
     <S.Container>
-      <S.Header>
-        <S.TitleSection>
-          <h1>Nova Ordem de Serviço</h1>
-        </S.TitleSection>
-      </S.Header>
+      <PageHeader title="Nova Ordem de Serviço" />
 
       <S.FormCard>
         <h2>Informações da Solicitação</h2>
+
         <form onSubmit={handleSubmit}>
           <S.FormGrid>
             <S.FormGroup>
@@ -153,9 +165,15 @@ const RegisterOS = () => {
 
             <S.FormGroup>
               <label htmlFor="localId">Local / Setor</label>
-              <select id="localId" name="localId" value={form.localId} onChange={handleChange} required>
+              <select
+                id="localId"
+                name="localId"
+                value={form.localId}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Selecione o local</option>
-                {locations.map(loc => (
+                {locations.map((loc) => (
                   <option key={loc.id} value={loc.id}>
                     {loc.locationName}
                   </option>
@@ -165,7 +183,13 @@ const RegisterOS = () => {
 
             <S.FormGroup>
               <label htmlFor="prioridade">Prioridade</label>
-              <select id="prioridade" name="prioridade" value={form.prioridade} onChange={handleChange} required>
+              <select
+                id="prioridade"
+                name="prioridade"
+                value={form.prioridade}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Defina a urgência</option>
                 <option value="Alta">🔴 Alta</option>
                 <option value="Baixa">🟢 Baixa</option>
@@ -174,9 +198,15 @@ const RegisterOS = () => {
 
             <S.FormGroup>
               <label htmlFor="produtoId">Equipamento / Produto</label>
-              <select id="produtoId" name="produtoId" value={form.produtoId} onChange={handleChange} required>
+              <select
+                id="produtoId"
+                name="produtoId"
+                value={form.produtoId}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Selecione o item</option>
-                {products.map(prod => (
+                {products.map((prod) => (
                   <option key={prod.id} value={prod.id}>
                     {prod.productName}
                   </option>
@@ -209,11 +239,24 @@ const RegisterOS = () => {
       {showSuccessModal && (
         <S.ModalOverlay>
           <S.ModalContent>
-            <FiCheckCircle size={60} color="#10b981" style={{ marginBottom: '20px' }} />
+            <FiCheckCircle
+              size={60}
+              color="#10b981"
+              style={{ marginBottom: '20px' }}
+            />
             <h2>Solicitação Enviada!</h2>
-            <p>Sua OS foi gerada com sucesso. Anote o número do seu protocolo para consultas futuras.</p>
+            <p>
+              Sua OS foi gerada com sucesso. Anote o número do seu protocolo para
+              consultas futuras.
+            </p>
+
             {protocol && <S.ProtocolBadge>#{protocol}</S.ProtocolBadge>}
-            <Button primary onClick={() => setShowSuccessModal(false)} style={{ width: '100%' }}>
+
+            <Button
+              primary
+              onClick={() => setShowSuccessModal(false)}
+              style={{ width: '100%' }}
+            >
               Entendi
             </Button>
           </S.ModalContent>
