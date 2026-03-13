@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components'
 import { useToast } from '@/hooks/useToast'
 import { FiCheckCircle, FiXCircle, FiAlertTriangle, FiInfo, FiX } from 'react-icons/fi'
 
-const ToastContainer: React.FC = () => {
+const Toast: React.FC = () => {
   const { toasts, removeToast } = useToast()
 
   return (
@@ -28,7 +28,7 @@ const ToastContainer: React.FC = () => {
   )
 }
 
-export default ToastContainer
+export { Toast }
 
 // ========================================
 // STYLED COMPONENTS

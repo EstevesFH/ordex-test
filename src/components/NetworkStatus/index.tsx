@@ -23,4 +23,4 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ children }) => {
   return <>{children}</>
 }
 
-export default NetworkStatus
+export { NetworkStatus }

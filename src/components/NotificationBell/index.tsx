@@ -144,7 +144,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) => {
   )
 }
 
-export default NotificationBell
+export { NotificationBell }
 
 // ========================================
 // STYLED COMPONENTS

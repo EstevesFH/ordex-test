@@ -35,7 +35,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
       {Array.from({ length: count }).map((_, index) => (
         <SkeletonBox
           // eslint-disable-next-line react-hooks/purity
-          key={`skeleton-${variant}-${width}-${height}-${borderRadius}-${index}-${Math.random().toString(36).substr(2, 9)}`}
+          key={`skeleton-${variant}-${width}-${height}-${borderRadius}-${index}-${Math.random().toString(36).slice(2, 11)}`}
           style={{
             width,
             height,
@@ -47,7 +47,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
   )
 }
 
-export default Skeleton
+export { Skeleton }
 
 // ========================================
 // COMPONENTES PRÉ-CONFIGURADOS
